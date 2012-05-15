@@ -256,13 +256,12 @@ class Chosen extends AbstractChosen
     @search_results.css("maxHeight", "240px")
 
     # Fix maximum size
-    dropdownBottom = @dropdown.position().top + @dropdown.height()
-    windowHeight = $(window).height()
-
-    if dropdownBottom > windowHeight
-      maxHeight = @dropdown.height() - (dropdownBottom  - windowHeight)
-      @dropdown.css("maxHeight", maxHeight + "px")
-      @search_results.css("maxHeight", (maxHeight - @search_container.height() - 10) + "px")
+    realDropdownTop = @dropdown.offset().top - $(window).scrollTop()
+    maxHeight = $(window).height() - realDropdownTop
+    maxHeight = 240 if maxHeight > 240
+    maxHeight = 100 if maxHeight < 100
+    @dropdown.css("maxHeight", maxHeight + "px")
+    @search_results.css("maxHeight", ( maxHeight - @search_container.height() - 10 ) + "px")
 
     @results_showing = true
 

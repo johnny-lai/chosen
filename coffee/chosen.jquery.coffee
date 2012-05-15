@@ -68,6 +68,9 @@ class Chosen extends AbstractChosen
 
     this.results_build()
     this.set_tab_index()
+
+    $("body").append( @dropdown )
+
     @form_field_jq.trigger("liszt:ready", {chosen: this})
 
   register_observers: ->
@@ -75,6 +78,9 @@ class Chosen extends AbstractChosen
     @container.mouseup (evt) => this.container_mouseup(evt)
     @container.mouseenter (evt) => this.mouse_enter(evt)
     @container.mouseleave (evt) => this.mouse_leave(evt)
+
+    @dropdown.mouseenter (evt) => this.mouse_enter(evt)
+    @dropdown.mouseleave (evt) => this.mouse_leave(evt)
 
     @search_results.mouseup (evt) => this.search_results_mouseup(evt)
     @search_results.mouseover (evt) => this.search_results_mouseover(evt)
@@ -158,7 +164,7 @@ class Chosen extends AbstractChosen
 
 
   test_active_click: (evt) ->
-    if $(evt.target).parents('#' + @container_id).length
+    if $(evt.target).parents('#' + @container_id + ', .chzn-drop').length
       @active_field = true
     else
       this.close_field()
@@ -237,8 +243,27 @@ class Chosen extends AbstractChosen
       return false
 
     dd_top = if @is_multiple then @container.height() else (@container.height() - 1)
+    offset = @container.offset()
     @form_field_jq.trigger("liszt:showing_dropdown", {chosen: this})
-    @dropdown.css {"top":  dd_top + "px", "left":0}
+    @dropdown.css {
+      "top": (offset.top + dd_top) + "px",
+      "left": offset.left + "px",
+      "width": (@container.outerWidth(true) - 2) + "px", # 2px of border
+      "maxHeight": "99999px",
+      "display": "block"
+    }
+
+    @search_results.css("maxHeight", "240px")
+
+    # Fix maximum size
+    dropdownBottom = @dropdown.position().top + @dropdown.height()
+    windowHeight = $(window).height()
+
+    if dropdownBottom > windowHeight
+      maxHeight = @dropdown.height() - (dropdownBottom  - windowHeight)
+      @dropdown.css("maxHeight", maxHeight + "px")
+      @search_results.css("maxHeight", (maxHeight - @search_container.height() - 10) + "px")
+
     @results_showing = true
 
     @search_field.focus()

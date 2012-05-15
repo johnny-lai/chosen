@@ -594,7 +594,7 @@ Copyright (c) 2011 by Harvest
     };
 
     Chosen.prototype.results_show = function() {
-      var dd_top, dropdownBottom, maxHeight, offset, windowHeight;
+      var dd_top, maxHeight, offset, realDropdownTop;
       if (!this.is_multiple) {
         this.selected_item.addClass("chzn-single-with-drop");
         if (this.result_single_selected) {
@@ -619,13 +619,16 @@ Copyright (c) 2011 by Harvest
         "display": "block"
       });
       this.search_results.css("maxHeight", "240px");
-      dropdownBottom = this.dropdown.position().top + this.dropdown.height();
-      windowHeight = $(window).height();
-      if (dropdownBottom > windowHeight) {
-        maxHeight = this.dropdown.height() - (dropdownBottom - windowHeight);
-        this.dropdown.css("maxHeight", maxHeight + "px");
-        this.search_results.css("maxHeight", (maxHeight - this.search_container.height() - 10) + "px");
+      realDropdownTop = this.dropdown.offset().top - $(window).scrollTop();
+      maxHeight = $(window).height() - realDropdownTop;
+      if (maxHeight > 240) {
+        maxHeight = 240;
       }
+      if (maxHeight < 100) {
+        maxHeight = 100;
+      }
+      this.dropdown.css("maxHeight", maxHeight + "px");
+      this.search_results.css("maxHeight", (maxHeight - this.search_container.height() - 10) + "px");
       this.results_showing = true;
       this.search_field.focus();
       this.search_field.val(this.search_field.val());

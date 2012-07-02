@@ -89,7 +89,6 @@ class AbstractChosen
 
   keyup_checker: (evt) ->
     stroke = evt.which ? evt.keyCode
-    this.search_field_scale()
 
     switch stroke
       when 8

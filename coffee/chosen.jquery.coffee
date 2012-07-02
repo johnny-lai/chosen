@@ -53,7 +53,6 @@ class Chosen extends AbstractChosen
 
     @search_field = @container.find('input').first()
     @search_results = @container.find('ul.chzn-results').first()
-    this.search_field_scale()
 
     @search_no_results = @container.find('li.no-results').first()
 
@@ -149,7 +148,6 @@ class Chosen extends AbstractChosen
     this.clear_backstroke()
 
     this.show_search_field_default()
-    this.search_field_scale()
 
   activate_field: ->
     if not @is_multiple and not @active_field
@@ -197,7 +195,6 @@ class Chosen extends AbstractChosen
 
     this.search_field_disabled()
     this.show_search_field_default()
-    this.search_field_scale()
 
     @search_results.html content
     @parsing = false
@@ -388,7 +385,6 @@ class Chosen extends AbstractChosen
       @search_field.val ""
 
       @form_field_jq.trigger "change", {'selected': @form_field.options[item.options_index].value}
-      this.search_field_scale()
 
   result_activate: (el) ->
     el.addClass("active-result")
@@ -408,7 +404,6 @@ class Chosen extends AbstractChosen
     this.winnow_results()
 
     @form_field_jq.trigger "change", {deselected: @form_field.options[result_data.options_index].value}
-    this.search_field_scale()
 
   single_deselect_control_build: ->
     @selected_item.find("span").first().after "<abbr class=\"search-choice-close\"></abbr>" if @allow_single_deselect and @selected_item.find("abbr").length < 1
@@ -528,7 +523,6 @@ class Chosen extends AbstractChosen
 
   keydown_checker: (evt) ->
     stroke = evt.which ? evt.keyCode
-    this.search_field_scale()
 
     this.clear_backstroke() if stroke != 8 and this.pending_backstroke
 
@@ -550,32 +544,6 @@ class Chosen extends AbstractChosen
       when 40
         this.keydown_arrow()
         break
-
-  search_field_scale: ->
-    if @is_multiple
-      h = 0
-      w = 0
-
-      style_block = "position:absolute; left: -1000px; top: -1000px; display:none;"
-      styles = ['font-size','font-style', 'font-weight', 'font-family','line-height', 'text-transform', 'letter-spacing']
-
-      for style in styles
-        style_block += style + ":" + @search_field.css(style) + ";"
-
-      div = $('<div />', { 'style' : style_block })
-      div.text @search_field.val()
-      $('body').append div
-
-      w = div.width() + 25
-      div.remove()
-
-      if( w > @f_width-10 )
-        w = @f_width - 10
-
-      @search_field.css({'width': w + 'px'})
-
-      dd_top = @container.height()
-      @dropdown.css({"top":  dd_top + "px"})
 
   generate_random_id: ->
     string = "sel" + this.generate_random_char() + this.generate_random_char() + this.generate_random_char()

@@ -134,7 +134,8 @@ Copyright (c) 2011 by Harvest
       this.disable_search_threshold = this.options.disable_search_threshold || 0;
       this.search_contains = this.options.search_contains || false;
       this.choices = 0;
-      return this.max_selected_options = this.options.max_selected_options || Infinity;
+      this.max_selected_options = this.options.max_selected_options || Infinity;
+      return this.overflow_container = this.options.overflow_container;
     };
 
     AbstractChosen.prototype.set_default_text = function() {
@@ -318,7 +319,8 @@ Copyright (c) 2011 by Harvest
 
     Chosen.prototype.setup = function() {
       this.form_field_jq = $(this.form_field);
-      return this.is_rtl = this.form_field_jq.hasClass("chzn-rtl");
+      this.is_rtl = this.form_field_jq.hasClass("chzn-rtl");
+      return this.overflow_container = typeof this.overflow_container === "undefined" ? this.form_field_jq.parent() : this.overflow_container;
     };
 
     Chosen.prototype.finish_setup = function() {
@@ -351,12 +353,11 @@ Copyright (c) 2011 by Harvest
         "width": dd_width + "px",
         "top": dd_top + "px"
       });
-      $('.chz-scroll').scroll(function() {
-        return _this.update_position();
-      });
-      $(window).scroll(function() {
-        return _this.update_position();
-      });
+      if (this.overflow_container) {
+        $(this.overflow_container).on("scroll", function(evt) {
+          return _this.update_position(evt);
+        });
+      }
       this.search_field = this.container.find('input').first();
       this.search_results = this.container.find('ul.chzn-results').first();
       this.search_no_results = this.container.find('li.no-results').first();

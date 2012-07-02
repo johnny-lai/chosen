@@ -20,6 +20,7 @@ class Chosen extends AbstractChosen
   setup: ->
     @form_field_jq = $ @form_field
     @is_rtl = @form_field_jq.hasClass "chzn-rtl"
+    @overflow_container = if typeof @overflow_container is "undefined" then @form_field_jq.parent() else @overflow_container
 
   finish_setup: ->
     @form_field_jq.addClass "chzn-done"
@@ -51,10 +52,8 @@ class Chosen extends AbstractChosen
 
     @dropdown.css({"width": dd_width  + "px", "top": dd_top + "px"})
 
-    $('.chz-scroll').scroll =>
-      @update_position()
-    $(window).scroll =>
-      @update_position()
+    if @overflow_container
+      $( @overflow_container ).on "scroll", (evt) => @update_position(evt)
 
     @search_field = @container.find('input').first()
     @search_results = @container.find('ul.chzn-results').first()

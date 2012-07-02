@@ -326,7 +326,8 @@ Copyright (c) 2011 by Harvest
     };
 
     Chosen.prototype.set_up_html = function() {
-      var container_div, dd_top, dd_width, sf_width;
+      var container_div, dd_top, dd_width, sf_width,
+        _this = this;
       this.container_id = this.form_field.id.length ? this.form_field.id.replace(/[^\w]/g, '_') : this.generate_field_id();
       this.container_id += "_chzn";
       this.f_width = this.form_field_jq.outerWidth();
@@ -349,6 +350,12 @@ Copyright (c) 2011 by Harvest
       this.dropdown.css({
         "width": dd_width + "px",
         "top": dd_top + "px"
+      });
+      $('.chz-scroll').scroll(function() {
+        return _this.update_position();
+      });
+      $(window).scroll(function() {
+        return _this.update_position();
       });
       this.search_field = this.container.find('input').first();
       this.search_results = this.container.find('ul.chzn-results').first();
@@ -590,7 +597,6 @@ Copyright (c) 2011 by Harvest
     };
 
     Chosen.prototype.results_show = function() {
-      var dd_top, maxHeight, offset, realDropdownTop;
       if (!this.is_multiple) {
         this.selected_item.addClass("chzn-single-with-drop");
         if (this.result_single_selected) {
@@ -602,33 +608,40 @@ Copyright (c) 2011 by Harvest
         });
         return false;
       }
-      dd_top = this.is_multiple ? this.container.height() : this.container.height() - 1;
-      offset = this.container.offset();
-      this.form_field_jq.trigger("liszt:showing_dropdown", {
-        chosen: this
-      });
-      this.dropdown.css({
-        "top": (offset.top + dd_top) + "px",
-        "left": offset.left + "px",
-        "width": (this.container.outerWidth(true) - 2) + "px",
-        "maxHeight": "99999px",
-        "display": "block"
-      });
-      this.search_results.css("maxHeight", "240px");
-      realDropdownTop = this.dropdown.offset().top - $(window).scrollTop();
-      maxHeight = $(window).height() - realDropdownTop;
-      if (maxHeight > 240) {
-        maxHeight = 240;
-      }
-      if (maxHeight < 100) {
-        maxHeight = 100;
-      }
-      this.dropdown.css("maxHeight", maxHeight + "px");
-      this.search_results.css("maxHeight", (maxHeight - this.search_container.height() - 10) + "px");
       this.results_showing = true;
+      this.update_position();
       this.search_field.focus();
       this.search_field.val(this.search_field.val());
       return this.winnow_results();
+    };
+
+    Chosen.prototype.update_position = function() {
+      var dd_top, maxHeight, offset, realDropdownTop;
+      if (this.results_showing) {
+        dd_top = this.is_multiple ? this.container.height() : this.container.height() - 1;
+        offset = this.container.offset();
+        this.form_field_jq.trigger("liszt:showing_dropdown", {
+          chosen: this
+        });
+        this.dropdown.css({
+          "top": (offset.top + dd_top) + "px",
+          "left": offset.left + "px",
+          "width": (this.container.outerWidth(true) - 2) + "px",
+          "maxHeight": "99999px",
+          "display": "block"
+        });
+        this.search_results.css("maxHeight", "240px");
+        realDropdownTop = this.dropdown.offset().top - $(window).scrollTop();
+        maxHeight = $(window).height() - realDropdownTop;
+        if (maxHeight > 240) {
+          maxHeight = 240;
+        }
+        if (maxHeight < 100) {
+          maxHeight = 100;
+        }
+        this.dropdown.css("maxHeight", maxHeight + "px");
+        return this.search_results.css("maxHeight", (maxHeight - this.search_container.height() - 10) + "px");
+      }
     };
 
     Chosen.prototype.results_hide = function() {

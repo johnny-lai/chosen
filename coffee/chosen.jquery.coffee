@@ -582,9 +582,6 @@ class Chosen extends AbstractChosen
 
       @search_field.css({'width': w + 'px'})
 
-      dd_top = @container.height()
-      @dropdown.css({"top":  dd_top + "px"})
-
   generate_random_id: ->
     string = "sel" + this.generate_random_char() + this.generate_random_char() + this.generate_random_char()
     while $("#" + string).length > 0

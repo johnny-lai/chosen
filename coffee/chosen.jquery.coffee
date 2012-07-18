@@ -281,6 +281,7 @@ class Chosen extends AbstractChosen
   results_hide: ->
     @selected_item.removeClass "chzn-single-with-drop" unless @is_multiple
     this.result_clear_highlight()
+    @search_results.scrollTop(0);
     @form_field_jq.trigger("liszt:hiding_dropdown", {chosen: this})
     @dropdown.css {
       "left" : "-9000px",

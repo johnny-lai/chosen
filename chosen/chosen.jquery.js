@@ -396,6 +396,10 @@ Copyright (c) 2011 by Harvest
       this.container.mouseleave(function(evt) {
         return _this.mouse_leave(evt);
       });
+      this.container.keydown(function(evt) {
+        _this.results_show();
+        return _this.keydown_checker(evt);
+      });
       this.dropdown.mouseenter(function(evt) {
         return _this.mouse_enter(evt);
       });

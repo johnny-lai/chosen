@@ -82,6 +82,9 @@ class Chosen extends AbstractChosen
     @container.mouseup (evt) => this.container_mouseup(evt)
     @container.mouseenter (evt) => this.mouse_enter(evt)
     @container.mouseleave (evt) => this.mouse_leave(evt)
+    @container.keydown (evt) =>
+      this.results_show()
+      this.keydown_checker(evt)
 
     @dropdown.mouseenter (evt) => this.mouse_enter(evt)
     @dropdown.mouseleave (evt) => this.mouse_leave(evt)
@@ -363,7 +366,7 @@ class Chosen extends AbstractChosen
     this.results_reset_cleanup()
     @form_field_jq.trigger "change"
     this.results_hide() if @active_field
-  
+
   results_reset_cleanup: ->
     @selected_item.find("abbr").remove()
 

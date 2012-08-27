@@ -82,9 +82,10 @@ class Chosen extends AbstractChosen
     @container.mouseup (evt) => this.container_mouseup(evt)
     @container.mouseenter (evt) => this.mouse_enter(evt)
     @container.mouseleave (evt) => this.mouse_leave(evt)
-    @container.keydown (evt) =>
-      this.results_show()
-      this.keydown_checker(evt)
+
+    @container.find(".chzn-single").focus (evt) =>
+      @dropdown.css "display": "block"
+      @search_field.focus()
 
     @dropdown.mouseenter (evt) => this.mouse_enter(evt)
     @dropdown.mouseleave (evt) => this.mouse_leave(evt)

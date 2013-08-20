@@ -192,6 +192,12 @@ class AbstractChosen
           if regex.test part
             return true
 
+  choices: ->
+    result = []
+    for option in @form_field.options
+      result.push option.value if option.selected
+    result
+    
   choices_count: ->
     return @selected_option_count if @selected_option_count?
 

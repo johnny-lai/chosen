@@ -60,10 +60,10 @@ class Chosen extends AbstractChosen
       @search_container = @container.find('div.chosen-search').first()
       @selected_item = @container.find('.chosen-single').first()
     
-    this.results_build()
-    this.set_tab_index()
-    this.set_label_behavior()
-    @form_field_jq.trigger("chosen:ready", {chosen: this})
+    this.results_build () ->
+      this.set_tab_index()
+      this.set_label_behavior()
+      @form_field_jq.trigger("chosen:ready", {chosen: this})
 
   register_observers: ->
     @container.bind 'mousedown.chosen', (evt) => this.container_mousedown(evt); return
@@ -170,30 +170,31 @@ class Chosen extends AbstractChosen
     else
       this.close_field()
 
-  results_build: ->
+  results_build: (cb) ->
     @parsing = true
     @selected_option_count = null
 
-    @results_data = @source.to_array()
+    @results_data = this.search () ->
+      if @is_multiple
+        @search_choices.find("li.search-choice").remove()
+      else if not @is_multiple
+        this.single_set_selected_text()
+        if @disable_search or @form_field.options.length <= @disable_search_threshold
+          @search_field[0].readOnly = true
+          @container.addClass "chosen-container-single-nosearch"
+        else
+          @search_field[0].readOnly = false
+          @container.removeClass "chosen-container-single-nosearch"
 
-    if @is_multiple
-      @search_choices.find("li.search-choice").remove()
-    else if not @is_multiple
-      this.single_set_selected_text()
-      if @disable_search or @form_field.options.length <= @disable_search_threshold
-        @search_field[0].readOnly = true
-        @container.addClass "chosen-container-single-nosearch"
-      else
-        @search_field[0].readOnly = false
-        @container.removeClass "chosen-container-single-nosearch"
+      this.update_results_content this.results_option_build({first:true})
 
-    this.update_results_content this.results_option_build({first:true})
+      this.search_field_disabled()
+      this.show_search_field_default()
+      this.search_field_scale()
 
-    this.search_field_disabled()
-    this.show_search_field_default()
-    this.search_field_scale()
-
-    @parsing = false
+      @parsing = false
+  
+      cb.call(this) if cb?
 
   result_do_highlight: (el) ->
     if el.length

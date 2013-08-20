@@ -29,7 +29,7 @@ class AbstractChosen
     @inherit_select_classes = @options.inherit_select_classes || false
     @display_selected_options = if @options.display_selected_options? then @options.display_selected_options else true
     @display_disabled_options = if @options.display_disabled_options? then @options.display_disabled_options else true
-    @source = if @options.source? then new ArrayDataSource(@form_field, @options.source) else new SelectParser(@form_field)
+    @source = DataSource.instantiate @form_field, @options.source
 
   set_default_text: ->
     if @form_field.getAttribute("data-placeholder")
@@ -106,8 +106,8 @@ class AbstractChosen
     this.set_default_text()
     this.results_reset_cleanup() if not @is_multiple
     this.result_clear_highlight()
-    this.results_build()
-    this.winnow_results() if @results_showing
+    this.results_build () ->
+      this.winnow_results() if @results_showing
 
   reset_single_select_options: () ->
     for result in @results_data
@@ -125,7 +125,7 @@ class AbstractChosen
     else
       this.results_show()
 
-  winnow_results: ->
+  winnow_results: (cb) ->
     this.no_results_clear()
 
     results = 0
@@ -136,47 +136,50 @@ class AbstractChosen
     regex = new RegExp(regexAnchor + escapedSearchText, 'i')
     zregex = new RegExp(escapedSearchText, 'i')
 
-    for option in @results_data
+    this.search () ->
+      for option in @results_data
 
-      option.search_match = false
-      results_group = null
+        option.search_match = false
+        results_group = null
 
-      if this.include_option_in_results(option)
+        if this.include_option_in_results(option)
 
-        if option.group
-          option.group_match = false
-          option.active_options = 0
+          if option.group
+            option.group_match = false
+            option.active_options = 0
 
-        if option.group_array_index? and @results_data[option.group_array_index]
-          results_group = @results_data[option.group_array_index]
-          results += 1 if results_group.active_options is 0 and results_group.search_match
-          results_group.active_options += 1
-                
-        unless option.group and not @group_search
+          if option.group_array_index? and @results_data[option.group_array_index]
+            results_group = @results_data[option.group_array_index]
+            results += 1 if results_group.active_options is 0 and results_group.search_match
+            results_group.active_options += 1
+                  
+          unless option.group and not @group_search
 
-          option.search_text = if option.group then option.label else option.html
-          option.search_match = this.search_string_match(option.search_text, regex)
-          results += 1 if option.search_match and not option.group
+            option.search_text = if option.group then option.label else option.html
+            option.search_match = this.search_string_match(option.search_text, regex)
+            results += 1 if option.search_match and not option.group
 
-          if option.search_match
-            if searchText.length
-              startpos = option.search_text.search zregex
-              text = option.search_text.substr(0, startpos + searchText.length) + '</em>' + option.search_text.substr(startpos + searchText.length)
-              option.search_text = text.substr(0, startpos) + '<em>' + text.substr(startpos)
+            if option.search_match
+              if searchText.length
+                startpos = option.search_text.search zregex
+                text = option.search_text.substr(0, startpos + searchText.length) + '</em>' + option.search_text.substr(startpos + searchText.length)
+                option.search_text = text.substr(0, startpos) + '<em>' + text.substr(startpos)
 
-            results_group.group_match = true if results_group?
-          
-          else if option.group_array_index? and @results_data[option.group_array_index].search_match
-            option.search_match = true
+              results_group.group_match = true if results_group?
+            
+            else if option.group_array_index? and @results_data[option.group_array_index].search_match
+              option.search_match = true
 
-    this.result_clear_highlight()
+      this.result_clear_highlight()
 
-    if results < 1 and searchText.length
-      this.update_results_content ""
-      this.no_results searchText
-    else
-      this.update_results_content this.results_option_build()
-      this.winnow_results_set_highlight()
+      if results < 1 and searchText.length
+        this.update_results_content ""
+        this.no_results searchText
+      else
+        this.update_results_content this.results_option_build()
+        this.winnow_results_set_highlight()
+  
+      cb.call(this) if cb?
 
   search_string_match: (search_string, regex) ->
     if regex.test search_string
@@ -233,6 +236,15 @@ class AbstractChosen
 
     return true
 
+  get_search_request: ->
+    { term: this.get_search_text() }
+  
+  search: (cb) ->
+    that = this
+    @source.search this, (data) ->
+      that.results_data = data
+      cb.call(that) if cb?
+  
   search_results_touchstart: (evt) ->
     @touch_started = true
     this.search_results_mouseover(evt)

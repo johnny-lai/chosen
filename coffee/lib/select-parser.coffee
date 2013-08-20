@@ -58,13 +58,17 @@ class SelectParser
     unsafe_chars = /&(?!\w+;)|[\<\>\"\'\`]/g
     text.replace unsafe_chars, (chr) ->
       map[chr] || "&amp;"
-      
+  
+  search: (chosen, response_cb) ->
+    response_cb this.to_array()
+
   to_array: ->
-    @options_index = 0
-    @parsed = []
-    this.add_node( child ) for child in @form_field.childNodes
+    if not @parsed?
+      @options_index = 0
+      @parsed = []
+      this.add_node( child ) for child in @form_field.childNodes
     @parsed
   
   option: (item) ->
-    @form_field.options[result_data.options_index]
+    @form_field.options[item.options_index]
 

@@ -547,7 +547,7 @@
         <div></div>
         <div>
           <em>Into This (with fixed data source)</em>
-          <select class="fixed-data-source" multiple style="width:350px;">
+          <select class="chosen-source-array" multiple style="width:350px;">
           </select>
         </div>
       </div>
@@ -1470,7 +1470,8 @@
       '.chosen-select-deselect'  : {allow_single_deselect:true},
       '.chosen-select-no-single' : {disable_search_threshold:10},
       '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
-      '.chosen-select-width'     : {width:"95%"}
+      '.chosen-select-width'     : {width:"95%"},
+      '.chosen-source-array'     : {source:[{value: 1, label: "Hi"}, {value:2, label: "Mascot"}]}
     }
     for (var selector in config) {
       $(selector).chosen(config[selector]);

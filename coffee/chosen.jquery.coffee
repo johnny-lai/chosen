@@ -174,7 +174,7 @@ class Chosen extends AbstractChosen
     @parsing = true
     @selected_option_count = null
 
-    @results_data = this.search () ->
+    this.search () ->
       if @is_multiple
         @search_choices.find("li.search-choice").remove()
       else if not @is_multiple
@@ -338,10 +338,10 @@ class Chosen extends AbstractChosen
       else
         this.reset_single_select_options()
 
-      item = @results_data[ high[0].getAttribute("data-option-array-index") ]
+      item = @source.get_item(high[0].getAttribute("data-option-array-index"))
       item.selected = true
 
-      @source.option(item).selected = true
+      @source.get_option_element(item.array_index).selected = true
       @selected_option_count = null
 
       if @is_multiple
@@ -366,19 +366,22 @@ class Chosen extends AbstractChosen
 
     @selected_item.find("span").text(text)
 
-  result_deselect: (pos) ->
-    result_data = @results_data[pos]
+  result_deselect: (array_index) ->
+    # When deselecting we modify the DOM directly because results_data may have changed
+    option = @source.get_option_element(array_index)
 
-    if not @source.option(result_data).disabled
-      result_data.selected = false
+    if not option.disabled
+      option_value = option.value
 
-      @source.option(result_data).selected = false
+      @source.get_item(array_index).selected = false
+
+      option.selected = false
       @selected_option_count = null
 
       this.result_clear_highlight()
       this.winnow_results() if @results_showing
 
-      @form_field_jq.trigger "change", {deselected: @source.option(result_data).value}
+      @form_field_jq.trigger "change", {deselected: option_value}
       this.search_field_scale()
 
       return true

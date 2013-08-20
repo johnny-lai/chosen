@@ -543,11 +543,17 @@
           </select>
         </div>
       </div>
+      
+      <h2><a name="source" class="anchor" href="#source">Data Source</a></h2>
       <div class="side-by-side clearfix">
-        <div></div>
         <div>
-          <em>Into This (with fixed data source)</em>
+         <em>Source is an array</em>
           <select class="chosen-source-array" multiple style="width:350px;">
+          </select>
+        </div>
+        <div>
+         <em>Source is a function</em>
+          <select class="chosen-source-function" multiple style="width:350px;">
           </select>
         </div>
       </div>
@@ -1471,7 +1477,22 @@
       '.chosen-select-no-single' : {disable_search_threshold:10},
       '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
       '.chosen-select-width'     : {width:"95%"},
-      '.chosen-source-array'     : {source:[{value: 1, label: "Hi"}, {value:2, label: "Mascot"}]}
+      '.chosen-source-array'     : {source:[{value: 1, label: "Hi"}, {value:2, label: "Mascot"}]},
+      '.chosen-source-function'  : {
+        source: function(request, response) {
+          var data = [];
+          if(request.term) {
+            for(var i = 0; i < 10; ++i) {
+              var name = request.term + " (" + i + ")";
+              data.push({
+                label: name,
+                value: request.term + "-" + i
+              });
+            }
+          }
+          response(data)
+        }
+      }
     }
     for (var selector in config) {
       $(selector).chosen(config[selector]);

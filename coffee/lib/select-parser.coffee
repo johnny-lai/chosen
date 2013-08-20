@@ -2,8 +2,6 @@ class SelectParser
 
   constructor: (form_field) ->
     @form_field = form_field
-    @options_index = 0
-    @parsed = []
 
   add_node: (child) ->
     if child.nodeName.toUpperCase() is "OPTGROUP"
@@ -69,6 +67,8 @@ class SelectParser
       this.add_node( child ) for child in @form_field.childNodes
     @parsed
   
-  option: (item) ->
-    @form_field.options[item.options_index]
+  get_option_element: (array_index) ->
+    @form_field.options[array_index]
 
+  get_item: (array_index) ->
+    @parsed[array_index]

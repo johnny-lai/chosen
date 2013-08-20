@@ -16,3 +16,9 @@ class ArrayDataSource extends DataSource
       html: text,
       selected: false,
       disabled: false
+      
+  get_option_element: (array_index) ->
+    this.get_option_element_by_value(this.get_item(array_index).value)
+
+  get_item: (array_index) ->
+    @results[array_index]

@@ -1,6 +1,7 @@
 class SelectParser
 
-  constructor: ->
+  constructor: (form_field) ->
+    @form_field = form_field
     @options_index = 0
     @parsed = []
 
@@ -57,8 +58,13 @@ class SelectParser
     unsafe_chars = /&(?!\w+;)|[\<\>\"\'\`]/g
     text.replace unsafe_chars, (chr) ->
       map[chr] || "&amp;"
+      
+  to_array: ->
+    @options_index = 0
+    @parsed = []
+    this.add_node( child ) for child in @form_field.childNodes
+    @parsed
+  
+  option: (item) ->
+    @form_field.options[result_data.options_index]
 
-SelectParser.select_to_array = (select) ->
-  parser = new SelectParser()
-  parser.add_node( child ) for child in select.childNodes
-  parser.parsed

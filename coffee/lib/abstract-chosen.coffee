@@ -29,6 +29,7 @@ class AbstractChosen
     @inherit_select_classes = @options.inherit_select_classes || false
     @display_selected_options = if @options.display_selected_options? then @options.display_selected_options else true
     @display_disabled_options = if @options.display_disabled_options? then @options.display_disabled_options else true
+    @source = if @options.source? then new ArrayDataSource(@form_field, @options.source) else new SelectParser(@form_field)
 
   set_default_text: ->
     if @form_field.getAttribute("data-placeholder")

@@ -174,7 +174,7 @@ class Chosen extends AbstractChosen
     @parsing = true
     @selected_option_count = null
 
-    @results_data = SelectParser.select_to_array @form_field
+    @results_data = @source.to_array()
 
     if @is_multiple
       @search_choices.find("li.search-choice").remove()
@@ -340,7 +340,7 @@ class Chosen extends AbstractChosen
       item = @results_data[ high[0].getAttribute("data-option-array-index") ]
       item.selected = true
 
-      @form_field.options[item.options_index].selected = true
+      @source.option(item).selected = true
       @selected_option_count = null
 
       if @is_multiple
@@ -352,7 +352,7 @@ class Chosen extends AbstractChosen
 
       @search_field.val ""
 
-      @form_field_jq.trigger "change", {'selected': @form_field.options[item.options_index].value} if @is_multiple || @form_field.selectedIndex != @current_selectedIndex
+      @form_field_jq.trigger "change", {'selected': item.value} if @is_multiple || @form_field.selectedIndex != @current_selectedIndex
       @current_selectedIndex = @form_field.selectedIndex
       this.search_field_scale()
 
@@ -368,16 +368,16 @@ class Chosen extends AbstractChosen
   result_deselect: (pos) ->
     result_data = @results_data[pos]
 
-    if not @form_field.options[result_data.options_index].disabled
+    if not @source.option(result_data).disabled
       result_data.selected = false
 
-      @form_field.options[result_data.options_index].selected = false
+      @source.option(result_data).selected = false
       @selected_option_count = null
 
       this.result_clear_highlight()
       this.winnow_results() if @results_showing
 
-      @form_field_jq.trigger "change", {deselected: @form_field.options[result_data.options_index].value}
+      @form_field_jq.trigger "change", {deselected: @source.option(result_data).value}
       this.search_field_scale()
 
       return true

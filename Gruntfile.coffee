@@ -34,8 +34,18 @@ module.exports = (grunt) ->
         join: true
       compile:
         files:
-          'public/chosen.jquery.js': ['coffee/lib/select-parser.coffee', 'coffee/lib/abstract-chosen.coffee', 'coffee/chosen.jquery.coffee']
-          'public/chosen.proto.js': ['coffee/lib/select-parser.coffee', 'coffee/lib/abstract-chosen.coffee', 'coffee/chosen.proto.coffee']
+          'public/chosen.jquery.js': [
+            'coffee/lib/array-data-source.coffee',
+            'coffee/lib/select-parser.coffee',
+            'coffee/lib/abstract-chosen.coffee',
+            'coffee/chosen.jquery.coffee'
+          ]
+          'public/chosen.proto.js': [
+            'coffee/lib/array-data-source.coffee',
+            'coffee/lib/select-parser.coffee',
+            'coffee/lib/abstract-chosen.coffee',
+            'coffee/chosen.proto.coffee'
+          ]
 
     uglify:
       options:

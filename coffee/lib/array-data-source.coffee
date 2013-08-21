@@ -8,7 +8,7 @@ class ArrayDataSource extends DataSource
   
   add_option: (child) ->
     value = child.value || child
-    text = child.label || value
+    text = child.text || child.label || value
     @results.push
       array_index: @results.length
       text: text,

@@ -549,6 +549,7 @@
         <div>
          <em>Single select with an array data source</em>
           <select class="chosen-source-array" style="width:350px;">
+            <option value></option>
           </select>
         </div>
         <div>
@@ -561,6 +562,7 @@
         <div>
          <em>Single select with a function data source</em>
           <select class="chosen-source-function" style="width:350px;">
+            <option value></option>
           </select>
         </div>
         <div>
@@ -573,6 +575,7 @@
         <div>
          <em>Single select with a URL data source</em>
           <select class="chosen-source-string" style="width:350px;">
+            <option value></option>
           </select>
         </div>
         <div>
@@ -1501,10 +1504,17 @@
       '.chosen-select-no-single' : {disable_search_threshold:10},
       '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
       '.chosen-select-width'     : {width:"95%"},
-      '.chosen-source-array'     : {source:[{value: 1, label: "Hi"}, {value:2, label: "Mascot"}]},
-      '.chosen-source-string'    : {source: "http://127.0.0.1:3000/sample"},
+      '.chosen-source-array'     : {
+        allow_single_deselect: true,
+        source:[{value: 1, label: "Hi"}, {value:2, label: "Mascot"}]
+      },
+      '.chosen-source-string'    : {
+        allow_single_deselect: true,
+        source: "http://127.0.0.1:3000/sample"
+      },
       '.chosen-source-function'  : {
         disable_search_threshold: -1,
+        allow_single_deselect: true,
         source: function(request, response) {
           var data = [];
           if(request.term) {

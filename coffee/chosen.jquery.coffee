@@ -179,7 +179,7 @@ class Chosen extends AbstractChosen
         @search_choices.find("li.search-choice").remove()
       else if not @is_multiple
         this.single_set_selected_text()
-        if @disable_search or @form_field.options.length <= @disable_search_threshold
+        if @disable_search or @results_data.length <= @disable_search_threshold
           @search_field[0].readOnly = true
           @container.addClass "chosen-container-single-nosearch"
         else

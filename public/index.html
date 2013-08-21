@@ -557,6 +557,13 @@
           </select>
         </div>
       </div>
+      <div class="side-by-side clearfix">
+        <div>
+         <em>Source is a URL</em>
+          <select class="chosen-source-string" multiple style="width:350px;">
+          </select>
+        </div>
+      </div>
 
       <h2><a name="multiple-select" class="anchor" href="#multiple-select">Multiple Select</a></h2>
       <div class="side-by-side clearfix">
@@ -1478,6 +1485,7 @@
       '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
       '.chosen-select-width'     : {width:"95%"},
       '.chosen-source-array'     : {source:[{value: 1, label: "Hi"}, {value:2, label: "Mascot"}]},
+      '.chosen-source-string'    : {source: "http://127.0.0.1:3000/sample"},
       '.chosen-source-function'  : {
         source: function(request, response) {
           var data = [];

@@ -43,7 +43,7 @@ class DataSource
 DataSource.instantiate = (form_field, source) ->
   if not source?
     new SelectParser(form_field)
-  else if source instanceof String
+  else if typeof source == "string"
     new URLDataSource(form_field, source)
   else if source.call?
     new CallbackDataSource(form_field, source)

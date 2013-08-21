@@ -38,7 +38,7 @@ module.exports = (grunt) ->
             'coffee/lib/data-source.coffee',
             'coffee/lib/array-data-source.coffee',
             'coffee/lib/callback-data-source.coffee',
-            'coffee/lib/url-data-source.coffee',
+            'coffee/lib/url-data-source.jquery.coffee',
             'coffee/lib/select-parser.coffee',
             'coffee/lib/abstract-chosen.coffee',
             'coffee/chosen.jquery.coffee'
@@ -47,7 +47,6 @@ module.exports = (grunt) ->
             'coffee/lib/data-source.coffee',
             'coffee/lib/array-data-source.coffee',
             'coffee/lib/callback-data-source.coffee',
-            'coffee/lib/url-data-source.coffee',
             'coffee/lib/select-parser.coffee',
             'coffee/lib/abstract-chosen.coffee',
             'coffee/chosen.proto.coffee'

@@ -195,7 +195,7 @@ class AbstractChosen
   choices: ->
     result = []
     for option in @form_field.options
-      result.push option.value if option.selected
+      result.push option.value if option.value && option.selected
     result
     
   choices_count: ->
@@ -243,7 +243,7 @@ class AbstractChosen
     return true
 
   get_search_request: ->
-    { term: this.get_search_text() }
+    { term: this.get_search_text(), choices: this.choices() }
   
   search: (cb) ->
     that = this

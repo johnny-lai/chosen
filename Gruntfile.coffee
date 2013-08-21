@@ -55,7 +55,8 @@ module.exports = (grunt) ->
     uglify:
       options:
         mangle:
-          except: ['jQuery', 'AbstractChosen', 'Chosen', 'SelectParser']
+          except: ['jQuery', 'AbstractChosen', 'Chosen', 'SelectParser',
+                   'DataSource', 'CallbackDataSource', 'ArrayDataSource', 'URLDataSource']
         banner: "<%= minified_comments %>"
       minified_chosen_js:
         files:

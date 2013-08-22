@@ -1,6 +1,6 @@
 class URLDataSource extends CallbackDataSource
 
-  search: (chosen, response_cb) ->
+  perform_search: (chosen, response_cb) ->
     ds = this
 
     $.ajax

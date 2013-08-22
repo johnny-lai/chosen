@@ -35,19 +35,19 @@ module.exports = (grunt) ->
       compile:
         files:
           'public/chosen.jquery.js': [
+            'coffee/lib/select-parser.coffee',
             'coffee/lib/data-source.coffee',
             'coffee/lib/array-data-source.coffee',
             'coffee/lib/callback-data-source.coffee',
             'coffee/lib/url-data-source.jquery.coffee',
-            'coffee/lib/select-parser.coffee',
             'coffee/lib/abstract-chosen.coffee',
             'coffee/chosen.jquery.coffee'
           ]
           'public/chosen.proto.js': [
+            'coffee/lib/select-parser.coffee',
             'coffee/lib/data-source.coffee',
             'coffee/lib/array-data-source.coffee',
             'coffee/lib/callback-data-source.coffee',
-            'coffee/lib/select-parser.coffee',
             'coffee/lib/abstract-chosen.coffee',
             'coffee/chosen.proto.coffee'
           ]

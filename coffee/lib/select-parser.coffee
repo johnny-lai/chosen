@@ -24,17 +24,13 @@ class SelectParser
       if option.text != ""
         if group_position?
           @parsed[group_position].children += 1
-        @parsed.push
-          array_index: @parsed.length
-          options_index: @options_index
-          value: option.value
-          text: option.text
-          html: option.innerHTML
-          selected: option.selected
-          disabled: if group_disabled is true then group_disabled else option.disabled
-          group_array_index: group_position
-          classes: option.className
-          style: option.style.cssText
+        item = this.option_to_item option, group_disabled
+        item.array_index = @parsed.length
+        item.options_index = @options_index
+        item.disabled = group_disabled if group_disabled is true
+        item.group_array_index = group_position
+        
+        @parsed.push item
       else
         @parsed.push
           array_index: @parsed.length
@@ -66,6 +62,15 @@ class SelectParser
       @parsed = []
       this.add_node( child ) for child in @form_field.childNodes
     @parsed
+  
+  option_to_item: (option) ->
+    value: option.value
+    text: option.text
+    html: option.innerHTML
+    selected: option.selected
+    disabled: option.disabled
+    classes: option.className
+    style: option.style.cssText
   
   get_option_element: (array_index) ->
     @form_field.options[array_index]

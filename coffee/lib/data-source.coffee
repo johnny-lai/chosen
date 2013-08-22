@@ -1,28 +1,20 @@
-class DataSource
+class DataSource extends SelectParser
 
   # search_cb should be a function that accepts two arguments:
   # * A request object, with a single term property.
   # * A response callback. You must call this function and pass it an array
   #   with the results.
   constructor: (form_field, source) ->
-    @form_field = form_field
+    super(form_field)
     @source = source
-
-  escapeExpression: (text) ->
-    if not text? or text is false
-      return ""
-    unless /[\&\<\>\"\'\`]/.test(text)
-      return text
-    map =
-      "<": "&lt;"
-      ">": "&gt;"
-      '"': "&quot;"
-      "'": "&#x27;"
-      "`": "&#x60;"
-    unsafe_chars = /&(?!\w+;)|[\<\>\"\'\`]/g
-    text.replace unsafe_chars, (chr) ->
-      map[chr] || "&amp;"
   
+  options_to_hash: ->
+    options = {}
+    for child in @form_field.options
+      item = this.option_to_item(child)
+      options[item.value] = item
+    options
+      
   get_option_element_by_value: (value) ->
     # Check if option already exists
     e = $(@form_field)

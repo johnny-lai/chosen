@@ -588,6 +588,20 @@
         </div>
       </div>
 
+      <h2><a name="source" class="anchor" href="#hierarchical">Hierarchical</a></h2>
+      <div class="side-by-side clearfix">
+        <div>
+         <em>Single select with a function data source</em>
+          <select class="chosen-source-function-hierarchical" style="width:350px;">
+            <option></option>
+            <option value="f (0)" data-selected>f (0)</option>
+            <option value="f (2)" data-selected>f (2)</option>
+            <option value="d (0)" selected>d (0)</option>
+          </select>
+        </div>
+      </div>
+
+
       <h2><a name="multiple-select" class="anchor" href="#multiple-select">Multiple Select</a></h2>
       <div class="side-by-side clearfix">
         <div>
@@ -1501,6 +1515,24 @@
   <script src="chosen.jquery.js" type="text/javascript"></script>
   <script src="docsupport/prism.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
+    var source = {
+      'array': [{value: 1, label: "Hi"}, {value:2, label: "Mascot"}],
+      'string': "http://127.0.0.1:3000/sample",
+      'function': function(request, response) {
+        console.log($.param(request))
+        var data = [];
+        if(request.term) {
+          for(var i = 0; i < 10; ++i) {
+            var name = request.term + " (" + i + ")";
+            data.push({
+              text: name,
+              value: request.term + "-" + i
+            });
+          }
+        }
+        response(data)
+      }
+    }
     var config = {
       '.chosen-select'           : {},
       '.chosen-select-deselect'  : {allow_single_deselect:true},
@@ -1509,28 +1541,20 @@
       '.chosen-select-width'     : {width:"95%"},
       '.chosen-source-array'     : {
         allow_single_deselect: true,
-        source:[{value: 1, label: "Hi"}, {value:2, label: "Mascot"}]
+        source: source['array']
       },
       '.chosen-source-string'    : {
         allow_single_deselect: true,
-        source: "http://127.0.0.1:3000/sample"
+        source: source['string']
       },
       '.chosen-source-function'  : {
-        disable_search_threshold: -1,
         allow_single_deselect: true,
-        source: function(request, response) {
-          var data = [];
-          if(request.term) {
-            for(var i = 0; i < 10; ++i) {
-              var name = request.term + " (" + i + ")";
-              data.push({
-                label: name,
-                value: request.term + "-" + i
-              });
-            }
-          }
-          response(data)
-        }
+        source: source['function']
+      },
+      '.chosen-source-function-hierarchical'  : {
+        hierarchical: true,
+        allow_single_deselect: true,
+        source: source['function']
       }
     }
     for (var selector in config) {

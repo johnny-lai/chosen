@@ -40,7 +40,9 @@ class Chosen extends AbstractChosen
     @container = ($ "<div />", container_props)
 
     if @is_multiple
-      @container.html '<ul class="chosen-choices"><li class="search-field"><input type="text" value="' + @default_text + '" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="chosen-drop"><ul class="chosen-results"></ul></div>'
+      choices_class = ['chosen-choices']
+      choices_class.push 'chosen-hierarchical' if @hierarchical
+      @container.html '<ul class="' + choices_class.join(' ') + '"><li class="search-field"><input type="text" value="' + @default_text + '" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="chosen-drop"><ul class="chosen-results"></ul></div>'
     else
       @container.html '<a class="chosen-single chosen-default" tabindex="-1"><span>' + @default_text + '</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off" /></div><ul class="chosen-results"></ul></div>'
 
@@ -306,9 +308,18 @@ class Chosen extends AbstractChosen
 
       this.results_hide() if @is_multiple and this.choices_count() > 0 and @search_field.val().length < 1
 
+      if @hierarchical
+        parent_array_index = link.parents('li').prev().find('a').attr('data-option-array-index');
+ 
       link.parents('li').first().remove()
-
+      
       this.search_field_scale()
+      
+      if parent_array_index?
+        item = @source.get_item(parent_array_index)
+        item.selected = true
+        
+        @source.get_option_element(item.array_index).selected = true
 
   results_reset: ->
     this.reset_single_select_options()
@@ -367,7 +378,6 @@ class Chosen extends AbstractChosen
     @selected_item.find("span").text(text)
 
   result_deselect: (array_index) ->
-    # When deselecting we modify the DOM directly because results_data may have changed
     option = @source.get_option_element(array_index)
 
     if not option.disabled

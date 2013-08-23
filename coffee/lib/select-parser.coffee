@@ -67,7 +67,7 @@ class SelectParser
     value: option.value
     text: option.text
     html: option.innerHTML
-    selected: option.selected
+    selected: if option.attributes.getNamedItem('data-selected')? then true else option.selected
     disabled: option.disabled
     classes: option.className
     style: option.style.cssText

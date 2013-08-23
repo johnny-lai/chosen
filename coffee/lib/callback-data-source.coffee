@@ -3,13 +3,22 @@ class CallbackDataSource extends DataSource
   constructor: (form_field, source) ->
     super(form_field, source)
     @results = this.options_to_hash()
+    @cache = {}
     
   search: (chosen, response_cb) ->
     if chosen.results_data?
       # Call @source function, setting this to the chosen object
       # @param request
       # @param response_cb
-      this.perform_search(chosen, response_cb)
+      key = JSON.stringify(chosen.get_search_request())
+      data = @cache[key]
+      if not data?
+        ds = this
+        this.perform_search chosen, (data) ->
+          ds.cache[key] = data
+          response_cb (data)
+      else
+        response_cb(data)
     else
       this.did_search(chosen, response_cb, this.to_array())
   
@@ -19,13 +28,6 @@ class CallbackDataSource extends DataSource
       ds.did_search(chosen, response_cb, data)
   
   did_search: (chosen, response_cb, data) ->
-    results = {}
-    
-    # Keep only results that have been chosen
-    for value in chosen.choices()
-      results[value] = @results[value]
-    @results = results
-    
     # Merge with new results
     options = (this.add_option_from_data child for child in data)
       

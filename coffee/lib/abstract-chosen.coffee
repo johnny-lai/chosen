@@ -251,8 +251,8 @@ class AbstractChosen
   get_search_request: ->
     req =
       term: this.get_search_text()
-    choices = $(@form_field).val()
-    req['choices'] = choices if choices?
+    val = $(@form_field).val()
+    req['val'] = val if val
     req
   
   search: (cb) ->

@@ -247,12 +247,8 @@ class AbstractChosen
     return true
 
   get_search_request: ->
-    req =
-      term: this.get_search_text()
-    val = $(@form_field).val()
-    req['val'] = val if val
-    req['refinements'] = @refinements
-    req
+    term: this.get_search_text()
+    refinements: @refinements
   
   search: (cb) ->
     that = this

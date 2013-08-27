@@ -588,19 +588,6 @@
         </div>
       </div>
 
-      <h2><a name="source" class="anchor" href="#hierarchical">Hierarchical</a></h2>
-      <div class="side-by-side clearfix">
-        <div>
-         <em>Single select with a function data source</em>
-          <select class="chosen-source-function-hierarchical" style="width:350px;">
-            <option></option>
-            <option value="f (0)" data-selected>f (0)</option>
-            <option value="f (2)" data-selected>f (2)</option>
-            <option value="d (0)" selected>d (0)</option>
-          </select>
-        </div>
-      </div>
-
 
       <h2><a name="multiple-select" class="anchor" href="#multiple-select">Multiple Select</a></h2>
       <div class="side-by-side clearfix">
@@ -1526,7 +1513,8 @@
             var name = request.term + " (" + i + ")";
             data.push({
               text: name,
-              value: request.term + "-" + i
+              value: request.term + "-" + i,
+              is_refinement: request.term.match(/class/) !== null
             });
           }
         }
@@ -1548,11 +1536,6 @@
         source: source['string']
       },
       '.chosen-source-function'  : {
-        allow_single_deselect: true,
-        source: source['function']
-      },
-      '.chosen-source-function-hierarchical'  : {
-        hierarchical: true,
         allow_single_deselect: true,
         source: source['function']
       }

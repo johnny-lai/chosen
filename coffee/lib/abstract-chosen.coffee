@@ -2,6 +2,7 @@ class AbstractChosen
 
   constructor: (@form_field, @options={}) ->
     return unless AbstractChosen.browser_is_supported()
+    @refinements = []
     @is_multiple = @form_field.multiple
     this.set_default_text()
     this.set_default_values()
@@ -30,12 +31,6 @@ class AbstractChosen
     @display_selected_options = if @options.display_selected_options? then @options.display_selected_options else true
     @display_disabled_options = if @options.display_disabled_options? then @options.display_disabled_options else true
     @source = DataSource.instantiate @form_field, @options.source
-    # For hierarchical mode, we need:
-    # * Single select
-    # * A single blank option is the first option
-    # So we cannot enable hierarchical mode if we are in a multiple select
-    @hierarchical = if @options.hierarchical? and !@is_multiple and @form_field.options[0]? and @form_field.options[0].text is "" then @options.hierarchical else false
-    @is_multiple = true if @hierarchical
 
   set_default_text: ->
     if @form_field.getAttribute("data-placeholder")
@@ -223,7 +218,7 @@ class AbstractChosen
 
     switch stroke
       when 8
-        if @is_multiple and @backstroke_length < 1 and this.choices_count() > 0
+        if @backstroke_length < 1 and this.choices_count() > 0
           this.keydown_backstroke()
         else if not @pending_backstroke
           this.result_clear_highlight()
@@ -253,6 +248,7 @@ class AbstractChosen
       term: this.get_search_text()
     val = $(@form_field).val()
     req['val'] = val if val
+    req['refinements'] = @refinements
     req
   
   search: (cb) ->

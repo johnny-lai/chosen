@@ -41,10 +41,9 @@ class Chosen extends AbstractChosen
 
     if @is_multiple
       choices_class = ['chosen-choices']
-      choices_class.push 'chosen-hierarchical' if @hierarchical
       @container.html '<ul class="' + choices_class.join(' ') + '"><li class="search-field"><input type="text" value="' + @default_text + '" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="chosen-drop"><ul class="chosen-results"></ul></div>'
     else
-      @container.html '<a class="chosen-single chosen-default" tabindex="-1"><span>' + @default_text + '</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off" /></div><ul class="chosen-results"></ul></div>'
+      @container.html '<a class="chosen-single chosen-default" tabindex="-1"><span>' + @default_text + '</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><ul class="chosen-refinements"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul></div><ul class="chosen-results"></ul></div>'
 
     @form_field_jq.hide().after @container
     @dropdown = @container.find('div.chosen-drop').first()
@@ -59,7 +58,8 @@ class Chosen extends AbstractChosen
       @search_choices = @container.find('ul.chosen-choices').first()
       @search_container = @container.find('li.search-field').first()
     else
-      @search_container = @container.find('div.chosen-search').first()
+      @search_container = @container.find('li.search-field').first()
+      @search_scroller = @search_field.offsetParent()
       @selected_item = @container.find('.chosen-single').first()
     
     this.results_build () ->
@@ -86,6 +86,9 @@ class Chosen extends AbstractChosen
     @form_field_jq.bind "chosen:activate.chosen", (evt) => this.activate_field(evt); return
     @form_field_jq.bind "chosen:open.chosen", (evt) => this.container_mousedown(evt); return
 
+    if @search_scroller
+      @search_scroller.bind 'click.chosen', (evt) => this.activate_field(evt); return
+    
     @search_field.bind 'blur.chosen', (evt) => this.input_blur(evt); return
     @search_field.bind 'keyup.chosen', (evt) => this.keyup_checker(evt); return
     @search_field.bind 'keydown.chosen', (evt) => this.keydown_checker(evt); return
@@ -241,6 +244,7 @@ class Chosen extends AbstractChosen
 
   results_hide: ->
     if @results_showing
+      this.result_clear_refinements()
       this.result_clear_highlight()
 
       @container.removeClass "chosen-with-drop"
@@ -285,6 +289,9 @@ class Chosen extends AbstractChosen
   search_results_mouseout: (evt) ->
     this.result_clear_highlight() if $(evt.target).hasClass "active-result" or $(evt.target).parents('.active-result').first()
 
+  refinement_build: (item) ->
+    this.choice_build item
+    
   choice_build: (item) ->
     choice = $('<li />', { class: "search-choice" }).html("<span>#{item.html}</span>")
 
@@ -303,23 +310,19 @@ class Chosen extends AbstractChosen
     this.choice_destroy $(evt.target) unless @is_disabled
 
   choice_destroy: (link) ->
-    if this.result_deselect( link[0].getAttribute("data-option-array-index") )
+    array_index = link[0].getAttribute("data-option-array-index")
+    item = @source.get_item(array_index)
+    
+    deselected = if item.is_refinement then this.result_unrefine(array_index) else this.result_deselect(array_index)
+    
+    if deselected
       this.show_search_field_default()
 
       this.results_hide() if @is_multiple and this.choices_count() > 0 and @search_field.val().length < 1
 
-      if @hierarchical
-        parent_array_index = link.parents('li').prev().find('a').attr('data-option-array-index');
- 
       link.parents('li').first().remove()
       
       this.search_field_scale()
-      
-      if parent_array_index?
-        item = @source.get_item(parent_array_index)
-        item.selected = true
-        
-        @source.get_option_element(item.array_index).selected = true
 
   results_reset: ->
     this.reset_single_select_options()
@@ -350,23 +353,37 @@ class Chosen extends AbstractChosen
         this.reset_single_select_options()
 
       item = @source.get_item(high[0].getAttribute("data-option-array-index"))
-      item.selected = true
-
-      @source.get_option_element(item.array_index).selected = true
-      @selected_option_count = null
-
-      if @is_multiple
-        this.choice_build item
+      
+      # Don't actually select anything if this is a refinement
+      if item.is_refinement
+        this.result_refine item.array_index
+        
+        this.refinement_build item
       else
-        this.single_set_selected_text(item.text)
+        item.selected = true
 
-      this.results_hide() unless (evt.metaKey or evt.ctrlKey) and @is_multiple
+        @source.get_option_element(item.array_index).selected = true
+        @selected_option_count = null
 
+        if @is_multiple
+          this.choice_build item
+        else
+          this.single_set_selected_text(item.text)
+        
       @search_field.val ""
-
-      @form_field_jq.trigger "change", {'selected': item.value} if @is_multiple || @form_field.selectedIndex != @current_selectedIndex
-      @current_selectedIndex = @form_field.selectedIndex
       this.search_field_scale()
+      
+      if item.is_refinement
+        @search_field.focus()
+
+        this.result_clear_highlight()
+        # Search for refinement
+        this.winnow_results() if @results_showing
+      else
+        this.results_hide() unless (evt.metaKey or evt.ctrlKey) and @is_multiple
+
+        @form_field_jq.trigger "change", {'selected': item.value} if @is_multiple || @form_field.selectedIndex != @current_selectedIndex
+        @current_selectedIndex = @form_field.selectedIndex
 
   single_set_selected_text: (text=@default_text) ->
     if text is @default_text
@@ -377,6 +394,20 @@ class Chosen extends AbstractChosen
 
     @selected_item.find("span").text(text)
 
+  result_refine: (array_index) ->
+    item = @source.get_item(array_index)
+    @refinements.push(item.value)
+  
+  result_unrefine: (array_index) ->
+    item = @source.get_item(array_index)
+    idx = @refinements.lastIndexOf(item.value)
+    @refinements = @refinements.slice(0, idx) if idx > -1
+    return true
+    
+  result_clear_refinements: ->
+    @refinements = []
+    @search_container.siblings("li").remove()
+  
   result_deselect: (array_index) ->
     option = @source.get_option_element(array_index)
 
@@ -485,7 +516,7 @@ class Chosen extends AbstractChosen
         break
 
   search_field_scale: ->
-    if @is_multiple
+    if true #@is_multiple
       h = 0
       w = 0
 
@@ -508,3 +539,8 @@ class Chosen extends AbstractChosen
         w = f_width - 10
 
       @search_field.css({'width': w + 'px'})
+
+      if @search_scroller
+        cw = @search_scroller.scrollLeft() + @search_scroller.width()
+        
+        @search_scroller.scrollLeft(cw - w)

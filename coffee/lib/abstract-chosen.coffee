@@ -83,6 +83,7 @@ class AbstractChosen
     classes.push "disabled-result" if option.disabled and !(option.selected and @is_multiple)
     classes.push "result-selected" if option.selected
     classes.push "group-option" if option.group_array_index?
+    classes.push "is-refinement" if option.is_refinement
     classes.push option.classes if option.classes != ""
 
     option_el = document.createElement("li")

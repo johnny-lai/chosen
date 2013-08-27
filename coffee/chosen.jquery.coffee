@@ -295,6 +295,8 @@ class Chosen extends AbstractChosen
   choice_build: (item) ->
     choice = $('<li />', { class: "search-choice" }).html("<span>#{item.html}</span>")
 
+    choice.addClass 'is-refinement' if item.is_refinement
+    
     if item.disabled
       choice.addClass 'search-choice-disabled'
     else

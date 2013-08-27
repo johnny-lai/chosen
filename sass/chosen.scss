@@ -33,7 +33,10 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
   a{
     cursor: pointer;
   }
-  
+  .is-refinement:after {
+    content: " › ";
+  }
+
   .chosen-refinements {
     position: relative;
     overflow: hidden;
@@ -90,9 +93,6 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
         color: #333;
         /*line-height: normal;*/
 
-        &:after {
-          content: " › ";
-        }
         .search-choice-close {
           display: none;
         }

@@ -161,7 +161,9 @@ class AbstractChosen
             option.search_match = this.search_string_match(option.search_text, regex)
             results += 1 if option.search_match and not option.group
 
-            if option.search_match
+            if option.always_show
+              option.search_match = true
+            else if option.search_match
               if searchText.length
                 startpos = option.search_text.search zregex
                 text = option.search_text.substr(0, startpos + searchText.length) + '</em>' + option.search_text.substr(startpos + searchText.length)

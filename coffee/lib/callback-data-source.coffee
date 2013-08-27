@@ -35,10 +35,11 @@ class CallbackDataSource extends DataSource
       
   add_option_from_data: (child) ->
     item = @results[child.value] || child
-    
-    item.array_index = item.value
+
     item.text = item.label || item if not item.text?
     item.html = item.text if not item.html?
+    item.value = item.text if not item.value
+    item.array_index = item.value
     item.selected = item.selected || false
     item.disabled = item.disabled || false
 

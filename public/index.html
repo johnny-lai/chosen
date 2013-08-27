@@ -1517,6 +1517,11 @@
               is_refinement: request.term.match(/class/) !== null
             });
           }
+          data.push({
+            text: "And many more...",
+            always_show: true,
+            disabled: true
+          });
         }
         response(data)
       }

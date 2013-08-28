@@ -43,7 +43,7 @@ class Chosen extends AbstractChosen
       choices_class = ['chosen-choices']
       @container.html '<ul class="' + choices_class.join(' ') + '"><li class="search-field"><input type="text" value="' + @default_text + '" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="chosen-drop"><ul class="chosen-results"></ul></div>'
     else
-      @container.html '<a class="chosen-single chosen-default" tabindex="-1"><span>' + @default_text + '</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><ul class="chosen-refinements"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul></div><ul class="chosen-results"></ul></div>'
+      @container.html '<a class="chosen-single chosen-default" tabindex="-1"><span>' + @default_text + '</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul></div><ul class="chosen-results"></ul></div>'
 
     @form_field_jq.hide().after @container
     @dropdown = @container.find('div.chosen-drop').first()
@@ -234,7 +234,7 @@ class Chosen extends AbstractChosen
 
     @results_showing = true
 
-    this.result_refinements_build()
+    this.result_scopes_build()
     
     @search_field.focus()
     @search_field.val @search_field.val()
@@ -290,14 +290,14 @@ class Chosen extends AbstractChosen
   search_results_mouseout: (evt) ->
     this.result_clear_highlight() if $(evt.target).hasClass "active-result" or $(evt.target).parents('.active-result').first()
 
-  refinement_build: (item, insert) ->
+  scope_build: (item, insert) ->
     this.choice_build item, insert
-    this.result_refine item
+    this.result_narrow item
     
   choice_build: (item, insert = (choice) -> @search_container.before choice) ->
     choice = $('<li />', { class: "search-choice" }).html("<span>#{item.html}</span>")
 
-    choice.addClass 'is-refinement' if item.is_refinement
+    choice.addClass 'is-scope' if item.is_scope
     
     if item.disabled
       choice.addClass 'search-choice-disabled'
@@ -317,14 +317,14 @@ class Chosen extends AbstractChosen
     array_index = link[0].getAttribute("data-option-array-index")
     item = @source.get_item(array_index)
     
-    deselected = if item.is_refinement then this.result_unrefine(item) else this.result_deselect(array_index)
+    deselected = if item.is_scope then this.result_expand(item) else this.result_deselect(array_index)
     
     if deselected
       this.show_search_field_default()
 
       this.results_hide() if @is_multiple and this.choices_count() > 0 and @search_field.val().length < 1
       
-      this.winnow_results() if item.is_refinement
+      this.winnow_results() if item.is_scope
 
       link.parents('li').first().remove()
       
@@ -361,8 +361,8 @@ class Chosen extends AbstractChosen
       item = @source.get_item(high[0].getAttribute("data-option-array-index"))
       
       # Don't actually select anything if this is a refinement
-      if item.is_refinement
-        this.refinement_build item
+      if item.is_scope
+        this.scope_build item
       else
         item.selected = true
 
@@ -377,7 +377,7 @@ class Chosen extends AbstractChosen
       @search_field.val ""
       this.search_field_scale()
       
-      if item.is_refinement
+      if item.is_scope
         @search_field.focus()
 
         this.result_clear_highlight()
@@ -398,24 +398,24 @@ class Chosen extends AbstractChosen
 
     @selected_item.find("span").text(text)
 
-  result_refine: (item) ->
-    @refinements.push(item.value)
+  result_narrow: (item) ->
+    @scopes.push(item.value)
   
-  result_unrefine: (item) ->
-    idx = @refinements.lastIndexOf(item.value)
-    @refinements = @refinements.slice(0, idx) if idx > -1
+  result_expand: (item) ->
+    idx = @scopes.lastIndexOf(item.value)
+    @scopes = @scopes.slice(0, idx) if idx > -1
     return true
     
-  result_clear_refinements: ->
-    @refinements = []
+  result_clear_scope: ->
+    @scopes = []
     @search_container.siblings("li").remove()
     
-  result_refinements_build: ->
-    this.result_clear_refinements()
+  result_scopes_build: ->
+    this.result_clear_scope()
     if not @is_multiple
       v = @source.get_item_by_value(@form_field_jq.val())
-      while v? and (v = @source.get_item_by_value(v.parent))?
-        this.refinement_build v, (choice) ->
+      while v? and (v = @source.get_item_by_value(v.in_scope))?
+        this.scope_build v, (choice) ->
           @search_container.parent().prepend choice
     
   result_deselect: (array_index) ->

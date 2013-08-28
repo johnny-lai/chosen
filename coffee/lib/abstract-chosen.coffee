@@ -2,7 +2,7 @@ class AbstractChosen
 
   constructor: (@form_field, @options={}) ->
     return unless AbstractChosen.browser_is_supported()
-    @refinements = []
+    @scopes = []
     @is_multiple = @form_field.multiple
     this.set_default_text()
     this.set_default_values()
@@ -83,7 +83,7 @@ class AbstractChosen
     classes.push "disabled-result" if option.disabled and !(option.selected and @is_multiple)
     classes.push "result-selected" if option.selected
     classes.push "group-option" if option.group_array_index?
-    classes.push "is-refinement" if option.is_refinement
+    classes.push "is-scope" if option.is_scope
     classes.push option.classes if option.classes != ""
 
     option_el = document.createElement("li")
@@ -248,7 +248,7 @@ class AbstractChosen
 
   get_search_request: ->
     term: this.get_search_text()
-    refinements: @refinements
+    scopes: @scopes
   
   search: (cb) ->
     that = this

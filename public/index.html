@@ -564,8 +564,8 @@
          <em>Single select with a function data source</em>
           <select class="chosen-source-function" style="width:350px;">
             <option value></option>
-            <option value="parent of d" data='{"is_refinement":true}'>parent of d</option>
-            <option value="d (0)" selected data='{"parent": "parent of d"}'>d (0)</option>
+            <option value="Scope of d" data='{"is_scope":true}'>Scope of d</option>
+            <option value="d (0)" selected data='{"in_scope": "Scope of d"}'>d (0)</option>
           </select>
         </div>
         <div>
@@ -1507,20 +1507,20 @@
       'array': [{
         value: 1,
         label: "Hi",
-        parent: 3
+        in_scope: 3
       }, {
         value: 2,
         label: "Mascot",
-        parent: 4
+        in_scope: 4
       }, {
         value: 3,
         label: "Greetings",
-        parent: 4,
-        is_refinement: true
+        in_scope: 4,
+        is_scope: true
       }, {
         value: 4,
         label: "English",
-        is_refinement: true
+        is_scope: true
       }],
       'string': "http://127.0.0.1:3000/sample",
       'function': function(request, response) {
@@ -1531,13 +1531,13 @@
           if(request.term) {
             name = request.term;
           } else {
-            name = request.refinements.join("-")
+            name = request.scopes.join("-")
           }
           name = name + " (" + i + ")";
           data.push({
             text: name,
             value: name + "-" + i,
-            is_refinement: request.term.match(/class/) !== null
+            is_scope: request.term.match(/class/) !== null
           });
         }
         data.push({

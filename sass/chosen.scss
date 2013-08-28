@@ -33,10 +33,10 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
   a{
     cursor: pointer;
   }
-  .is-refinement:after {
+  .is-scope:after {
     content: " › ";
   }
-  .chosen-refinements {
+  .chosen-scopes {
     position: relative;
     overflow: hidden;
     margin: 0;
@@ -45,7 +45,7 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
     @include background($chosen-sprite no-repeat 100% -20px, linear-gradient(#eee 1%, #fff 15%));
     cursor: text;
   }
-  .chosen-refinements {
+  .chosen-scopes {
     & li {
       display: inline;
       list-style: none;

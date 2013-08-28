@@ -71,13 +71,21 @@ class SelectParser
     hash
   
   option_to_item: (option) ->
-    value: option.value
-    text: option.text
-    html: option.innerHTML
-    selected: if option.attributes.getNamedItem('data-selected')? then true else option.selected
-    disabled: option.disabled
-    classes: option.className
-    style: option.style.cssText
+    item =
+      value: option.value
+      text: option.text
+      html: option.innerHTML
+      selected: option.selected
+      disabled: option.disabled
+      classes: option.className
+      style: option.style.cssText
+    
+    data = option.attributes.getNamedItem('data')
+    if data?
+      data = JSON.parse(data.value)
+      item[k] = v for k, v of data
+    
+    item
   
   get_option_element: (array_index) ->
     @form_field.options[array_index]

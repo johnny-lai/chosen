@@ -414,7 +414,7 @@ class Chosen extends AbstractChosen
     this.result_clear_refinements()
     if not @is_multiple
       v = @source.get_item_by_value(@form_field_jq.val())
-      while (v = v.parent)?
+      while v? and (v = v.parent)?
         this.refinement_build @source.get_item_by_value(v)
     
   

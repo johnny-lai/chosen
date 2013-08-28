@@ -2,7 +2,7 @@ class ArrayDataSource extends DataSource
 
   search: (chosen, response_cb) ->
     if not @results?
-      options = this.options_to_hash()
+      options = this.select_to_hash('value')
       @results = []
       this.add_option options, child for child in @source
     response_cb @results

@@ -7,13 +7,6 @@ class DataSource extends SelectParser
   constructor: (form_field, source) ->
     super(form_field)
     @source = source
-  
-  options_to_hash: ->
-    options = {}
-    for child in @form_field.options
-      item = this.option_to_item(child)
-      options[item.value] = item
-    options
       
   get_option_element_by_value: (value) ->
     # Check if option already exists

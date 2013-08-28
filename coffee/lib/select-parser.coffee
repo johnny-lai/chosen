@@ -54,14 +54,21 @@ class SelectParser
       map[chr] || "&amp;"
   
   search: (chosen, response_cb) ->
-    response_cb this.to_array()
+    response_cb this.select_to_array()
 
-  to_array: ->
+  select_to_array: ->
     if not @parsed?
       @options_index = 0
       @parsed = []
       this.add_node( child ) for child in @form_field.childNodes
     @parsed
+  
+  select_to_hash: (key) ->
+    hash = {}
+    for child in @form_field.options
+      item = this.option_to_item(child)
+      hash[item[key]] = item
+    hash
   
   option_to_item: (option) ->
     value: option.value

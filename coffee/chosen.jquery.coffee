@@ -290,11 +290,11 @@ class Chosen extends AbstractChosen
   search_results_mouseout: (evt) ->
     this.result_clear_highlight() if $(evt.target).hasClass "active-result" or $(evt.target).parents('.active-result').first()
 
-  scope_build: (item, insert) ->
-    this.choice_build item, insert
+  scope_build: (item) ->
+    this.choice_build item
     this.result_narrow item
     
-  choice_build: (item, insert = (choice) -> @search_container.before choice) ->
+  choice_build: (item) ->
     choice = $('<li />', { class: "search-choice" }).html("<span>#{item.html}</span>")
 
     choice.addClass 'is-scope' if item.is_scope
@@ -306,7 +306,7 @@ class Chosen extends AbstractChosen
       close_link.bind 'click.chosen', (evt) => this.choice_destroy_link_click(evt)
       choice.append close_link
     
-    insert.call(this, choice)
+    @search_container.before choice
 
   choice_destroy_link_click: (evt) ->
     evt.preventDefault()
@@ -413,10 +413,11 @@ class Chosen extends AbstractChosen
   result_scopes_build: ->
     this.result_clear_scope()
     if not @is_multiple
+      h = []
       v = @source.get_item_by_value(@form_field_jq.val())
       while v? and (v = @source.get_item_by_value(v.in_scope))?
-        this.scope_build v, (choice) ->
-          @search_container.parent().prepend choice
+        h.push(v)
+      this.scope_build v for v in h by -1
     
   result_deselect: (array_index) ->
     option = @source.get_option_element(array_index)

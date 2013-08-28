@@ -290,11 +290,11 @@ class Chosen extends AbstractChosen
   search_results_mouseout: (evt) ->
     this.result_clear_highlight() if $(evt.target).hasClass "active-result" or $(evt.target).parents('.active-result').first()
 
-  refinement_build: (item) ->
-    this.choice_build item
+  refinement_build: (item, insert) ->
+    this.choice_build item, insert
     this.result_refine item
     
-  choice_build: (item) ->
+  choice_build: (item, insert = (choice) -> @search_container.before choice) ->
     choice = $('<li />', { class: "search-choice" }).html("<span>#{item.html}</span>")
 
     choice.addClass 'is-refinement' if item.is_refinement
@@ -306,7 +306,7 @@ class Chosen extends AbstractChosen
       close_link.bind 'click.chosen', (evt) => this.choice_destroy_link_click(evt)
       choice.append close_link
     
-    @search_container.before  choice
+    insert.call(this, choice)
 
   choice_destroy_link_click: (evt) ->
     evt.preventDefault()
@@ -414,10 +414,10 @@ class Chosen extends AbstractChosen
     this.result_clear_refinements()
     if not @is_multiple
       v = @source.get_item_by_value(@form_field_jq.val())
-      while v? and (v = v.parent)?
-        this.refinement_build @source.get_item_by_value(v)
+      while v? and (v = @source.get_item_by_value(v.parent))?
+        this.refinement_build v, (choice) ->
+          @search_container.parent().prepend choice
     
-  
   result_deselect: (array_index) ->
     option = @source.get_option_element(array_index)
 

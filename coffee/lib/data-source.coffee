@@ -25,6 +25,9 @@ class DataSource extends SelectParser
   get_item: (array_index) ->
     null
     
+  get_item_by_value: (value) ->
+    null
+    
 DataSource.instantiate = (form_field, source) ->
   if not source?
     new SelectParser(form_field)

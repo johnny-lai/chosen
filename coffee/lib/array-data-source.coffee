@@ -9,18 +9,24 @@ class ArrayDataSource extends DataSource
   
   add_option: (options, child) ->
     value = child.value || child
-    text = child.text || child.label || value
-    option = options[value] || {}
-    @results.push
-      array_index: @results.length
-      text: text,
-      value: value,
-      html: text,
-      selected: child.selected || option.selected || false,
-      disabled: child.disabled || option.disabled || false
-      
+    item = options[value] || {}
+    item[k] = v for k, v of child
+
+    item.text = item.label || item if not item.text?
+    item.html = item.text if not item.html?
+    item.value = value if not item.value
+    item.array_index = @results.length
+    item.selected = item.selected || false
+    item.disabled = item.disabled || false
+
+    @results.push(item)
+    
   get_option_element: (array_index) ->
     this.get_option_element_by_value(this.get_item(array_index).value)
 
   get_item: (array_index) ->
     @results[array_index]
+    
+  get_item_by_value: (value) ->
+    return obj for obj in @results when ""+obj.value == ""+value
+    null

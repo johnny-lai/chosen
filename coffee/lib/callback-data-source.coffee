@@ -51,3 +51,6 @@ class CallbackDataSource extends DataSource
   
   get_item: (array_index) ->
     @results[array_index]
+  
+  get_item_by_value: (value) ->
+    this.get_item value

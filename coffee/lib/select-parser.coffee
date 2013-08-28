@@ -92,3 +92,7 @@ class SelectParser
 
   get_item: (array_index) ->
     @parsed[array_index]
+
+  get_item_by_value: (value) ->
+    return obj for obj in @parsed when obj.value == value
+    null

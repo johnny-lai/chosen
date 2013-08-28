@@ -550,7 +550,7 @@
          <em>Single select with an array data source</em>
           <select class="chosen-source-array" style="width:350px;">
             <option value></option>
-            <option value="1" selected>
+            <option value="1" selected>Hi</option>
           </select>
         </div>
         <div>
@@ -564,7 +564,8 @@
          <em>Single select with a function data source</em>
           <select class="chosen-source-function" style="width:350px;">
             <option value></option>
-            <option value="d (0)" selected>d (0)</option>
+            <option value="parent of d" data='{"is_refinement":true}'>parent of d</option>
+            <option value="d (0)" selected data='{"parent": "parent of d"}'>d (0)</option>
           </select>
         </div>
         <div>
@@ -1503,7 +1504,18 @@
   <script src="docsupport/prism.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
     var source = {
-      'array': [{value: 1, label: "Hi"}, {value:2, label: "Mascot"}],
+      'array': [{
+        value: 1,
+        label: "Hi",
+        parent: 3
+      }, {
+        value: 2,
+        label: "Mascot"
+      }, {
+        value: 3,
+        label: "Parent of Hi",
+        is_refinement: true
+      }],
       'string': "http://127.0.0.1:3000/sample",
       'function': function(request, response) {
         console.log($.param(request))

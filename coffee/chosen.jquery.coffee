@@ -234,6 +234,8 @@ class Chosen extends AbstractChosen
 
     @results_showing = true
 
+    this.result_refinements_build()
+    
     @search_field.focus()
     @search_field.val @search_field.val()
 
@@ -244,7 +246,6 @@ class Chosen extends AbstractChosen
 
   results_hide: ->
     if @results_showing
-      this.result_clear_refinements()
       this.result_clear_highlight()
 
       @container.removeClass "chosen-with-drop"
@@ -291,6 +292,7 @@ class Chosen extends AbstractChosen
 
   refinement_build: (item) ->
     this.choice_build item
+    this.result_refine item
     
   choice_build: (item) ->
     choice = $('<li />', { class: "search-choice" }).html("<span>#{item.html}</span>")
@@ -315,7 +317,7 @@ class Chosen extends AbstractChosen
     array_index = link[0].getAttribute("data-option-array-index")
     item = @source.get_item(array_index)
     
-    deselected = if item.is_refinement then this.result_unrefine(array_index) else this.result_deselect(array_index)
+    deselected = if item.is_refinement then this.result_unrefine(item) else this.result_deselect(array_index)
     
     if deselected
       this.show_search_field_default()
@@ -360,8 +362,6 @@ class Chosen extends AbstractChosen
       
       # Don't actually select anything if this is a refinement
       if item.is_refinement
-        this.result_refine item.array_index
-        
         this.refinement_build item
       else
         item.selected = true
@@ -398,12 +398,10 @@ class Chosen extends AbstractChosen
 
     @selected_item.find("span").text(text)
 
-  result_refine: (array_index) ->
-    item = @source.get_item(array_index)
+  result_refine: (item) ->
     @refinements.push(item.value)
   
-  result_unrefine: (array_index) ->
-    item = @source.get_item(array_index)
+  result_unrefine: (item) ->
     idx = @refinements.lastIndexOf(item.value)
     @refinements = @refinements.slice(0, idx) if idx > -1
     return true
@@ -411,6 +409,14 @@ class Chosen extends AbstractChosen
   result_clear_refinements: ->
     @refinements = []
     @search_container.siblings("li").remove()
+    
+  result_refinements_build: ->
+    this.result_clear_refinements()
+    if not @is_multiple
+      v = @source.get_item_by_value(@form_field_jq.val())
+      while (v = v.parent)?
+        this.refinement_build @source.get_item_by_value(v)
+    
   
   result_deselect: (array_index) ->
     option = @source.get_option_element(array_index)

@@ -415,7 +415,7 @@ class Chosen extends AbstractChosen
     if not @is_multiple
       h = []
       v = @source.get_item_by_value(@form_field_jq.val())
-      while v? and (v = @source.get_item_by_value(v.in_scope))?
+      while v? and v.in_scope? and (v = @source.get_item_by_value(v.in_scope))?
         h.push(v)
       this.scope_build v for v in h by -1
     

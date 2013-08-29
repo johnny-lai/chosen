@@ -14,7 +14,9 @@ class CallbackDataSource extends DataSource
       data = @cache[key]
       if not data?
         ds = this
+        chosen.loading(true)
         this.perform_search chosen, (data) ->
+          chosen.loading(false)
           ds.cache[key] = data
           response_cb (data)
       else

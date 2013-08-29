@@ -42,8 +42,18 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
     margin: 0;
     padding: 0 20px 0 0 ;
     border: 1px solid #aaa;
-    @include background($chosen-sprite no-repeat 100% -20px, linear-gradient(#eee 1%, #fff 15%));
+    @include background(linear-gradient(#eee 1%, #fff 15%));
     cursor: text;
+    .search-state {
+      @include background($chosen-sprite no-repeat 100% -20px);
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 20px;
+      padding: 0;
+      margin: 0;
+    }
   }
   .chosen-scopes {
     & li {

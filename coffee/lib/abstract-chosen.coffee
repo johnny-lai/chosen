@@ -150,8 +150,8 @@ class AbstractChosen
             option.group_match = false
             option.active_options = 0
 
-          if option.group_array_index? and @results_data[option.group_array_index]
-            results_group = @results_data[option.group_array_index]
+          if option.group_array_index? and @source.get_item(option.group_array_index)
+            results_group = @source.get_item(option.group_array_index)
             results += 1 if results_group.active_options is 0 and results_group.search_match
             results_group.active_options += 1
                   
@@ -171,7 +171,7 @@ class AbstractChosen
 
               results_group.group_match = true if results_group?
             
-            else if option.group_array_index? and @results_data[option.group_array_index].search_match
+            else if option.group_array_index? and @source.get_item(option.group_array_index).search_match
               option.search_match = true
 
       this.result_clear_highlight()

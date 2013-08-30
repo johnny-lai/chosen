@@ -1526,6 +1526,11 @@
       'function': function(request, response) {
         console.log($.param(request))
         var data = [];
+        data.push({
+          value: 'group',
+          group: true,
+          label: "Sample"
+        });
         for(var i = 0; i < 10; ++i) {
           var name;
           if(request.term) {
@@ -1535,6 +1540,7 @@
           }
           name = name + " (" + i + ")";
           data.push({
+            group_array_index: 'group',
             text: name,
             value: name + "-" + i,
             is_scope: request.term.match(/class/) !== null
@@ -1545,7 +1551,7 @@
           always_show: true,
           disabled: true
         });
-        response(data)
+        response(data);
       }
     }
     var config = {

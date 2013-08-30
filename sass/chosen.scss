@@ -37,8 +37,9 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
     content: " › ";
   }
   .search-state {
-    @include background($chosen-sprite no-repeat 100% -20px, linear-gradient(#eee 1%, #fff 15%));
     background-color: white;
+    @include background($chosen-sprite no-repeat 100% -20px);
+    @include background($chosen-sprite no-repeat 100% -20px, linear-gradient(#eee 1%, #fff 15%));
     position: absolute;
     right: 5px;
     top: 4px;

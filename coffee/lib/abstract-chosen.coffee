@@ -82,7 +82,7 @@ class AbstractChosen
     classes.push "active-result" if !option.disabled and !(option.selected and @is_multiple)
     classes.push "disabled-result" if option.disabled and !(option.selected and @is_multiple)
     classes.push "result-selected" if option.selected
-    classes.push "group-option" if option.group_array_index?
+    classes.push "group-option" if option.group_array_index? and @source.get_item(option.group_array_index)?
     classes.push "is-scope" if option.is_scope
     classes.push option.classes if option.classes != ""
 

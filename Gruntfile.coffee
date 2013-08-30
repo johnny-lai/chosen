@@ -107,7 +107,13 @@ module.exports = (grunt) ->
         cwd: 'public/'
         src: ['public/**/*']
         dest: "chosen_#{version_tag()}.zip"
-
+        
+    connect:
+      server:
+        options:
+          hostname: '*'
+          base: './public'
+    
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-concat'
@@ -119,7 +125,8 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-build-gh-pages'
   grunt.loadNpmTasks 'grunt-zip'
   grunt.loadNpmTasks 'grunt-dom-munger'
-
+  grunt.loadNpmTasks 'grunt-contrib-connect'
+  
   grunt.registerTask 'default', ['build']
   grunt.registerTask 'build', ['coffee', 'compass', 'concat', 'uglify', 'cssmin']
   grunt.registerTask 'gh_pages', ['copy:dist', 'build_gh_pages:gh_pages']
@@ -138,3 +145,5 @@ module.exports = (grunt) ->
     json1[key] = json2[key] for key of json2
     json1.author.name = pkg.author
     grunt.file.write('chosen.jquery.json', JSON.stringify(json1, null, 2))
+  
+  grunt.registerTask('dev', ['default', 'connect', 'watch']);

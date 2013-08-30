@@ -402,9 +402,11 @@ class Chosen extends AbstractChosen
     @scopes.push(item.value)
   
   result_expand: (item) ->
-    idx = @scopes.lastIndexOf(item.value)
-    @scopes = @scopes.slice(0, idx) if idx > -1
+    for v, i in @scopes by -1
+      if v == item.value
+        @scopes = @scopes.slice(0, i)
     return true
+    return false
     
   result_clear_scope: ->
     @scopes = []

@@ -405,12 +405,12 @@ class Chosen extends AbstractChosen
     for v, i in @scopes by -1
       if v == item.value
         @scopes = @scopes.slice(0, i)
-    return true
+        return true
     return false
-    
+
   result_clear_scope: ->
     @scopes = []
-    @search_container.siblings("li.search-choice").remove()
+    @search_container.siblings("li.is-scope").remove()
     
   result_scopes_build: ->
     this.result_clear_scope()

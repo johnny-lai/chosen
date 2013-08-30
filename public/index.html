@@ -1500,6 +1500,9 @@
     </div>
   </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript"></script>
+<!--[if IE 7 ]>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2.min.js" type="text/javascript"></script>
+<![endif]-->
   <script src="chosen.jquery.js" type="text/javascript"></script>
   <script src="docsupport/prism.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
@@ -1524,7 +1527,6 @@
       }],
       'string': "http://127.0.0.1:3000/sample",
       'function': function(request, response) {
-        console.log($.param(request))
         var data = [];
         data.push({
           value: 'group',
@@ -1577,6 +1579,17 @@
       $(selector).chosen(config[selector]);
     }
   </script>
+  
+<!--[if IE 7 ]>
+  <script type="text/javascript">
+    // IE 7 z-index fix
+    var zidx = 100;
+    $('.chosen-container').each(function(){
+        $(this).css('z-index', zidx);
+        zidx-=1;
+    });
+  </script>
+<![endif]-->
   </form>
   <div class="oss-bar">
     <ul>

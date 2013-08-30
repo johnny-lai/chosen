@@ -277,7 +277,15 @@ class AbstractChosen
 
   @browser_is_supported: ->
     if window.navigator.appName == "Microsoft Internet Explorer"
-      return document.documentMode >= 8
+      if document.documentMode
+        # IE 7 does not provide document.documentMode
+        return document.documentMode >= 8
+      else
+        # Parse userAgent string
+        re = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})")
+        if re.exec(navigator.userAgent)
+          return parseFloat(RegExp.$1) >= 7.0
+      return false
     if /iP(od|hone)/i.test(window.navigator.userAgent)
       return false
     if /Android/i.test(window.navigator.userAgent)

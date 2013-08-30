@@ -104,18 +104,20 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
   .chosen-search {
     position: relative;
     z-index: 1010;
-    margin: 0;
-    padding: 3px 4px;
+    margin: 3px 4px;
+    padding: 0;
     white-space: nowrap;
+    border: 1px solid #aaa;
+    @include background(linear-gradient(#eee 1%, #fff 15%));
 
     .search-state {
       background-color: white;
       @include background($chosen-sprite no-repeat 100% -20px);
       @include background($chosen-sprite no-repeat 100% -20px, linear-gradient(#eee 1%, #fff 15%));
       position: absolute;
-      right: 5px;
-      top: 4px;
-      bottom: 4px;
+      right: 0;
+      top: 0;
+      bottom: 0;
       width: 20px;
       padding: 0;
       margin: 0;
@@ -123,10 +125,8 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
     .chosen-scopes {
       position: relative;
       overflow: hidden;
-      margin: 0;
-      padding: 0 20px 0 0 ;
-      border: 1px solid #aaa;
-      @include background(linear-gradient(#eee 1%, #fff 15%));
+      margin: 0 20px 0 0;
+      padding: 0;
       cursor: text;
     }
     .chosen-scopes {
@@ -140,7 +140,7 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
           input[type="text"] {
             @include box-sizing(border-box);
             margin: 1px 0;
-            padding: 5px;
+            padding: 0 5px;
             height: 15px;
             outline: 0;
             border: 0 !important;

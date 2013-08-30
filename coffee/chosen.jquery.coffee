@@ -50,7 +50,6 @@ class Chosen extends AbstractChosen
 
     @search_field = @container.find('input').first()
     @search_results = @container.find('ul.chosen-results').first()
-    this.search_field_scale()
 
     @search_no_results = @container.find('li.no-results').first()
 
@@ -234,8 +233,6 @@ class Chosen extends AbstractChosen
 
     @results_showing = true
 
-    this.result_scopes_build()
-    
     @search_field.focus()
     @search_field.val @search_field.val()
 
@@ -398,6 +395,9 @@ class Chosen extends AbstractChosen
 
     @selected_item.find("span").text(text)
 
+    this.result_scopes_build()
+    this.search_field_scale()
+
   result_narrow: (item) ->
     @scopes.push(item.value)
   
@@ -554,8 +554,8 @@ class Chosen extends AbstractChosen
       @search_field.css({'width': w + 'px'})
 
       if @search_scroller
-        cw = @search_scroller.scrollLeft() + @search_scroller.width()
-        
+        cw = @search_scroller[0].scrollWidth
+
         @search_scroller.scrollLeft(cw - w)
   
   loading: (loading) ->

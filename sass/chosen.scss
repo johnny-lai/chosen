@@ -13,7 +13,6 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
   vertical-align: middle;
   font-size: 13px;
   zoom: 1;
-  *display: inline;
   @include user-select(none);
   .chosen-drop {
     position: absolute;
@@ -113,11 +112,10 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
     .search-state {
       background-color: white;
       @include background($chosen-sprite no-repeat 100% -20px);
-      @include background($chosen-sprite no-repeat 100% -20px, linear-gradient(#eee 1%, #fff 15%));
       position: absolute;
-      right: 0;
-      top: 0;
-      bottom: 0;
+      right: 1px;
+      top: 2px;
+      bottom: 1px;
       width: 20px;
       padding: 0;
       margin: 0;
@@ -130,18 +128,20 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
       cursor: text;
     }
     .chosen-scopes {
+      height: 25px;
       & li {
-        display: inline;
+        display: inline-block;
         list-style: none;
         &.search-field {
+          position: relative;
+          top: 0;
           margin: 0;
           padding: 0;
           white-space: nowrap;
           input[type="text"] {
             @include box-sizing(border-box);
             margin: 1px 0;
-            padding: 0 5px;
-            height: 15px;
+            padding: 2px 4px 4px;
             outline: 0;
             border: 0 !important;
             background: transparent !important;
@@ -159,9 +159,12 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
         &.search-choice {
           position: relative;
           margin: 0;
-          padding: 3px 0 4px 5px;
+          padding: 5px 0 5px 5px;
           background-color: #e4e4e4;
           color: #333;
+          font-size: 100%;
+          font-family: sans-serif;
+          line-height: normal;
 
           .search-choice-close {
             display: none;
@@ -353,7 +356,7 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
       }
     }
   }
-  .chosen-choices {
+  .chosen-choices, &.chosen-container-single .chosen-search {
     border: 1px solid #5897fb;
     box-shadow: 0 0 5px rgba(#000,.3);
     li.search-field input[type="text"] {

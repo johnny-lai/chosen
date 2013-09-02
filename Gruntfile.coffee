@@ -67,7 +67,7 @@ module.exports = (grunt) ->
       chosen_css:
         options:
           specify:
-            ['sass/chosen.scss']
+            ['sass/chosen.scss', 'sass/chosen-ie7.scss']
 
     cssmin:
       minified_chosen_css:

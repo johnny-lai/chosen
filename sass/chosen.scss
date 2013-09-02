@@ -34,8 +34,14 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
   a{
     cursor: pointer;
   }
-  .is-scope:after {
-    content: " › ";
+  li.is-scope {
+    padding-right: 20px !important;
+    @include background($chosen-edge no-repeat 100% -26px);
+  }
+  .chosen-results {
+    li.is-scope.highlighted {
+      @include background($chosen-edge no-repeat 100% -51px, linear-gradient(#3875d7 20%, #2a62bc 90%));
+    }
   }
   &.overflowing .chosen-search {
     .overflow {
@@ -122,7 +128,7 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
       top: 0;
       bottom: 0;
       width: 6px;
-      @include background($chosen-edge no-repeat top right);
+      @include background($chosen-edge no-repeat 0 0);
       display: none;
     }
 
@@ -483,7 +489,7 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
   }
   .chosen-container .overflow {
     background-image: $chosen-edge-retina !important;
-    background-size: 6px 25px !important;
+    background-size: 15px 76px !important;
   }
 }
 /* @end */

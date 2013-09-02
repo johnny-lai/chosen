@@ -5,6 +5,8 @@
 
 $chosen-sprite: image-url('chosen-sprite.png');
 $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
+$chosen-edge: image-url('chosen-edge.png');
+$chosen-edge-retina: image-url('chosen-edge@2x.png');
 
 /* @group Base */
 .chosen-container {
@@ -120,7 +122,7 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
       top: 0;
       bottom: 0;
       width: 6px;
-      @include background(image-url('chosen-edge.png') no-repeat top right);
+      @include background($chosen-edge no-repeat top right);
       display: none;
     }
 
@@ -478,6 +480,10 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
     background-image: $chosen-sprite-retina !important;
     background-size: 52px 37px !important;
     background-repeat: no-repeat !important;
+  }
+  .chosen-container .overflow {
+    background-image: $chosen-edge-retina !important;
+    background-size: 6px 25px !important;
   }
 }
 /* @end */

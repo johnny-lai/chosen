@@ -43,7 +43,7 @@ class Chosen extends AbstractChosen
       choices_class = ['chosen-choices']
       @container.html '<ul class="' + choices_class.join(' ') + '"><li class="search-field"><input type="text" value="' + @default_text + '" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="chosen-drop"><ul class="chosen-results"></ul></div>'
     else
-      @container.html '<a class="chosen-single chosen-default" tabindex="-1"><span>' + @default_text + '</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul><div class="search-state"></div></div><ul class="chosen-results"></ul></div>'
+      @container.html '<a class="chosen-single chosen-default" tabindex="-1"><span>' + @default_text + '</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul><div class="search-state"></div><div class="overflow"></div></div><ul class="chosen-results"></ul></div>'
 
     @form_field_jq.hide().after @container
     @dropdown = @container.find('div.chosen-drop').first()
@@ -58,7 +58,7 @@ class Chosen extends AbstractChosen
       @search_container = @container.find('li.search-field').first()
     else
       @search_container = @container.find('li.search-field').first()
-      @search_scroller = @search_field.offsetParent()
+      @search_scroller = @container.find('ul.chosen-scopes')
       @selected_item = @container.find('.chosen-single').first()
     
     this.results_build () ->
@@ -557,7 +557,9 @@ class Chosen extends AbstractChosen
         cw = @search_scroller[0].scrollWidth
 
         @search_scroller.scrollLeft(cw - w)
-  
+
+        this.overflowing(cw > @search_scroller.width())
+
   loading: (loading) ->
     return @is_loading if not loading? or @is_loading == loading
 
@@ -567,3 +569,13 @@ class Chosen extends AbstractChosen
       @container.removeClass('loading')
 
     @is_loading = loading
+
+  overflowing: (overflowing) ->
+    return @is_overflowing if not overflowing? or @is_overflowing == overflowing
+
+    if overflowing
+      @container.addClass('overflowing')
+    else
+      @container.removeClass('overflowing')
+
+    @is_overflowing = overflowing

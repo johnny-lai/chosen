@@ -35,6 +35,11 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
   .is-scope:after {
     content: " › ";
   }
+  &.overflowing .chosen-search {
+    .overflow {
+      display: block;
+    }
+  }
 }
 /* @end */
 
@@ -108,6 +113,16 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
     white-space: nowrap;
     border: 1px solid #aaa;
     @include background(linear-gradient(#eee 1%, #fff 15%));
+
+    .overflow {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      @include background(image-url('chosen-edge.png') no-repeat top right);
+      display: none;
+    }
 
     .search-state {
       background-color: white;

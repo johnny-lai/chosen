@@ -260,7 +260,7 @@ class Chosen extends AbstractChosen
       @dropdown.css {
         "top": (offset.top + dd_top) + "px",
         "left": offset.left + "px",
-        "width": @container.outerWidth(true) + "px",
+        "width": @container.outerWidth(false) + "px",
         "maxHeight": "99999px",
         "display": "block"
       }
@@ -596,7 +596,7 @@ class Chosen extends AbstractChosen
       @search_field.css({'width': w + 'px'})
       @update_position()
 
-      if @search_scroller
+      if @search_scroller and @search_scroller.is(":visible")
         cw = @search_scroller[0].scrollWidth
 
         @search_scroller.scrollLeft(cw - w)

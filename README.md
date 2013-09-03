@@ -7,24 +7,27 @@ Chosen is a library for making long, unwieldy select boxes more user friendly.
 For **documentation**, usage, and examples, see:  
 http://harvesthq.github.io/chosen/
 
-<<<<<<< HEAD
-### Fork Changes
-
-I've forked this project to render Chosen dropdown on page body, allowing Chosen to be used inside areas with `overflow:hidden`. This problem is very common, as you can see on [Issue #86](https://github.com/harvesthq/chosen/issues/86), but fixing it is not so easy.
-
-### Fork ToDo
-
-* Teste it more, with different customization options.
-* Prototype version. Only jQuery for now!
-
-### Chosen Credits
-
-- Built by [Harvest](http://www.getharvest.com/). Want to work on projects like this? [We’re hiring](http://www.getharvest.com/careers)!
-- Concept and development by [Patrick Filler](http://www.patrickfiller.com/)
-- Design and CSS by [Matthew Lettini](http://matthewlettini.com/)
-=======
 For **downloads**, see:  
 https://github.com/harvesthq/chosen/releases/
+
+### Fork Changes
+
+* Support for loading data from sources other than the OPTION tags. The aim is 
+  to allow chosen to be used as an autocomplete widget.
+  Similar to the jQuery autocomplete source option, a source can be:
+  * An array of objects
+  * A function
+  * A URL
+
+* Support for rendering "scopes" in single select mode. The aim was to allow chosen
+  to be used a hierarchical select.
+  
+* IE 7 is turned on. Note that you need to patch your CSS for IE7 to work.
+
+* Support for being within an `overflow:hidden` element. I basically merged and
+  tweaked https://github.com/gil/chosen.
+  
+* Prototype does not work.
 
 ### Contributing to this project
 
@@ -41,4 +44,3 @@ We welcome all to participate in making Chosen the best software it can be. The 
 - Design and CSS by [Matthew Lettini](http://matthewlettini.com/)
 - Repository maintained by [@pfiller](http://github.com/pfiller), [@kenearley](http://github.com/kenearley), [@stof](http://github.com/stof) and [@koenpunt](http://github.com/koenpunt).
 - Chosen includes [contributions by many fine folks](https://github.com/harvesthq/chosen/contributors).
->>>>>>> master

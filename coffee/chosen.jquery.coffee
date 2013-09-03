@@ -52,6 +52,8 @@ class Chosen extends AbstractChosen
     @form_field_jq.hide().after @container
     @dropdown = @container.find('div.chosen-drop').first()
 
+    @containers = @container.add(@dropdown)
+
     if @overflow_container
       $( @overflow_container ).live "scroll", (evt) => @update_position(evt)
 
@@ -607,9 +609,9 @@ class Chosen extends AbstractChosen
     return @is_loading if not loading? or @is_loading == loading
 
     if loading
-      @container.addClass('loading')
+      @containers.addClass('loading')
     else
-      @container.removeClass('loading')
+      @containers.removeClass('loading')
 
     @is_loading = loading
 
@@ -617,8 +619,9 @@ class Chosen extends AbstractChosen
     return @is_overflowing if not overflowing? or @is_overflowing == overflowing
 
     if overflowing
-      @container.addClass('overflowing')
+      @containers.addClass('overflowing')
     else
-      @container.removeClass('overflowing')
+      @containers.removeClass('overflowing')
+
 
     @is_overflowing = overflowing

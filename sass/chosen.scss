@@ -19,20 +19,6 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
   a{
     cursor: pointer;
   }
-  li.is-scope {
-    padding-right: 20px !important;
-    @include background($chosen-edge no-repeat 100% -26px);
-  }
-  .chosen-results {
-    li.is-scope.highlighted {
-      @include background($chosen-edge no-repeat 100% -51px, linear-gradient(#3875d7 20%, #2a62bc 90%));
-    }
-  }
-  &.overflowing .chosen-search {
-    .overflow {
-      display: block;
-    }
-  }
 }
 
 .chosen-drop {
@@ -51,6 +37,22 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
   border-top: 0;
   background: #fff;
   box-shadow: 0 4px 5px rgba(#000,.15);
+  
+  li.is-scope {
+    padding-right: 20px !important;
+    @include background($chosen-edge no-repeat 100% -26px);
+  }
+  
+  .chosen-results {
+    li.is-scope.highlighted {
+      @include background($chosen-edge no-repeat 100% -51px, linear-gradient(#3875d7 20%, #2a62bc 90%));
+    }
+  }
+  &.overflowing .chosen-search {
+    .overflow {
+      display: block;
+    }
+  }
 }
 /* @end */
 

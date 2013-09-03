@@ -260,7 +260,7 @@ class Chosen extends AbstractChosen
       @dropdown.css {
         "top": (offset.top + dd_top) + "px",
         "left": offset.left + "px",
-        "width": @container.outerWidth(false) + "px",
+        "width": (this.container.outerWidth(true) - 2) + "px",  # Subtract border because we are *not* in border-box mode
         "maxHeight": "99999px",
         "display": "block"
       }

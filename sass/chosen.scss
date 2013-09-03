@@ -31,7 +31,6 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
   top: 100%;
   left: -9999px;
   z-index: 1010;
-  @include box-sizing(border-box);
   width: 100%;
   border: 1px solid #aaa;
   border-top: 0;

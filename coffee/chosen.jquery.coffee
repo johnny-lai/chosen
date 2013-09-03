@@ -182,7 +182,7 @@ class Chosen extends AbstractChosen
 
 
   test_active_click: (evt) ->
-    if @container.is($(evt.target).closest('.chosen-container'))
+    if @containers.is($(evt.target).closest('.chosen-container, .chosen-drop'))
       @active_field = true
     else
       this.close_field()
@@ -198,12 +198,10 @@ class Chosen extends AbstractChosen
         this.single_set_selected_text()
         if @disable_search or @results_data.length <= @disable_search_threshold
           @search_field[0].readOnly = true
-          @container.addClass "chosen-container-single-nosearch"
-          @dropdown.addClass "chosen-container-single-nosearch"
+          @containers.addClass "chosen-container-single-nosearch"
         else
           @search_field[0].readOnly = false
-          @container.removeClass "chosen-container-single-nosearch"
-          @dropdown.removeClass "chosen-container-single-nosearch"
+          @containers.removeClass "chosen-container-single-nosearch"
 
       this.update_results_content this.results_option_build({first:true})
 

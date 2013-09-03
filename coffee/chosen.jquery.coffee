@@ -26,10 +26,13 @@ class Chosen extends AbstractChosen
     @overflow_container = if typeof @overflow_container is "undefined" then @form_field_jq.parent() else @overflow_container
 
   set_up_html: ->
-    container_classes = ["chosen-container"]
-    container_classes.push "chosen-container-" + (if @is_multiple then "multi" else "single")
-    container_classes.push @form_field.className if @inherit_select_classes && @form_field.className
-    container_classes.push "chosen-rtl" if @is_rtl
+    container_base_classes = []
+    container_base_classes.push "chosen-container-" + (if @is_multiple then "multi" else "single")
+    container_base_classes.push @form_field.className if @inherit_select_classes && @form_field.className
+    container_base_classes.push "chosen-rtl" if @is_rtl
+
+    container_classes = ["chosen-container"].concat(container_base_classes)
+    drop_classes = ["chosen-drop"].concat(container_base_classes)
 
     container_props =
       'class': container_classes.join ' '
@@ -42,15 +45,15 @@ class Chosen extends AbstractChosen
 
     if @is_multiple
       choices_class = ['chosen-choices']
-      @container.html '<ul class="' + choices_class.join(' ') + '"><li class="search-field"><input type="text" value="' + @default_text + '" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="chosen-drop"><ul class="chosen-results"></ul></div>'
+      @container.html '<ul class="' + choices_class.join(' ') + '"><li class="search-field"><input type="text" value="' + @default_text + '" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="' + drop_classes.join(' ') + '"><ul class="chosen-results"></ul></div>'
     else
-      @container.html '<a class="chosen-single chosen-default" tabindex="-1"><span>' + @default_text + '</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul><div class="search-state"></div><div class="overflow"></div></div><ul class="chosen-results"></ul></div>'
+      @container.html '<a class="chosen-single chosen-default" tabindex="-1"><span>' + @default_text + '</span><div><b></b></div></a><div class="' + drop_classes.join(' ') + '"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul><div class="search-state"></div><div class="overflow"></div></div><ul class="chosen-results"></ul></div>'
 
     @form_field_jq.hide().after @container
     @dropdown = @container.find('div.chosen-drop').first()
 
     if @overflow_container
-      $( @overflow_container ).on "scroll", (evt) => @update_position(evt)
+      $( @overflow_container ).live "scroll", (evt) => @update_position(evt)
 
     @search_field = @container.find('input').first()
     @search_results = @container.find('ul.chosen-results').first()
@@ -76,8 +79,8 @@ class Chosen extends AbstractChosen
   register_observers: ->
     @container.bind 'mousedown.chosen', (evt) => this.container_mousedown(evt); return
     @container.bind 'mouseup.chosen', (evt) => this.container_mouseup(evt); return
-    @container.bind 'mouseenter.chosen', (evt) => this.mouse_enter(evt); return
-    @container.bind 'mouseleave.chosen', (evt) => this.mouse_leave(evt); return
+    @dropdown.bind 'mouseenter.chosen', (evt) => this.mouse_enter(evt); return
+    @dropdown.bind 'mouseleave.chosen', (evt) => this.mouse_leave(evt); return
 
     @search_results.bind 'mouseup.chosen', (evt) => this.search_results_mouseup(evt); return
     @search_results.bind 'mouseover.chosen', (evt) => this.search_results_mouseover(evt); return
@@ -194,9 +197,11 @@ class Chosen extends AbstractChosen
         if @disable_search or @results_data.length <= @disable_search_threshold
           @search_field[0].readOnly = true
           @container.addClass "chosen-container-single-nosearch"
+          @dropdown.addClass "chosen-container-single-nosearch"
         else
           @search_field[0].readOnly = false
           @container.removeClass "chosen-container-single-nosearch"
+          @dropdown.removeClass "chosen-container-single-nosearch"
 
       this.update_results_content this.results_option_build({first:true})
 
@@ -236,6 +241,8 @@ class Chosen extends AbstractChosen
       @form_field_jq.trigger("chosen:maxselected", {chosen: this})
       return false
 
+    @container.addClass "chosen-with-drop"
+
     @results_showing = true
 
     this.update_position()
@@ -253,7 +260,7 @@ class Chosen extends AbstractChosen
       @dropdown.css {
         "top": (offset.top + dd_top) + "px",
         "left": offset.left + "px",
-        "width": (@container.outerWidth(true) - 2) + "px", # 2px of border
+        "width": @container.outerWidth(true) + "px",
         "maxHeight": "99999px",
         "display": "block"
       }
@@ -261,25 +268,28 @@ class Chosen extends AbstractChosen
       @search_results.css("maxHeight", "240px")
 
       # Fix maximum size
-      realDropdownTop = @dropdown.offset().top - $(window).scrollTop()
-      maxHeight = $(window).height() - realDropdownTop
-      maxHeight = 240 if maxHeight > 240
-      maxHeight = 100 if maxHeight < 100
-      @dropdown.css("maxHeight", maxHeight + "px")
-      @search_results.css("maxHeight", ( maxHeight - @search_container.height() - 10 ) + "px")
+      # realDropdownTop = @dropdown.offset().top - $(window).scrollTop()
+      # maxHeight = $(window).height() - realDropdownTop
+      # maxHeight = 240 if maxHeight > 240
+      # maxHeight = 100 if maxHeight < 100
+      # @dropdown.css("maxHeight", maxHeight + "px")
+      # @search_results.css("maxHeight", ( maxHeight - @search_container.height() - 10 ) + "px")
 
   update_results_content: (content) ->
     @search_results.html content
 
   results_hide: ->
-    @selected_item.removeClass "chosen-single-with-drop" unless @is_multiple
-    this.result_clear_highlight()
-    @search_results.scrollTop(0);
-    @form_field_jq.trigger("chosen:hiding_dropdown", {chosen: this})
-    @dropdown.css {
-      "left" : "-9000px",
-      "display" : "none"
-    }
+    if @results_showing
+      @search_results.scrollTop(0);
+
+      this.result_clear_highlight()
+
+      @container.removeClass "chosen-with-drop"
+      @form_field_jq.trigger("chosen:hiding_dropdown", {chosen: this})
+      @dropdown.css {
+        "left" : "-9000px",
+        "display" : "none"
+      }
     @results_showing = false
 
 

@@ -1,170 +1,175 @@
-###
-Chosen source: generate output using 'cake build'
-Copyright (c) 2011 by Harvest
-###
-root = this
 $ = jQuery
 
 $.fn.extend({
   chosen: (options) ->
     # Do no harm and return as soon as possible for unsupported browsers, namely IE6 and IE7
-    return this if $.browser.msie and ($.browser.version is "6.0" or  $.browser.version is "7.0")
-    this.each((input_field) ->
+    # Continue on if running IE document type but in compatibility mode
+    return this unless AbstractChosen.browser_is_supported()
+    this.each (input_field) ->
       $this = $ this
-      $this.data('chosen', new Chosen(this, options)) unless $this.hasClass "chzn-done"
-    )
+      chosen = $this.data('chosen')
+      if options is 'destroy' && chosen
+        chosen.destroy()
+      else unless chosen
+        $this.data('chosen', new Chosen(this, options))
+
+      return
+
 })
 
 class Chosen extends AbstractChosen
 
   setup: ->
     @form_field_jq = $ @form_field
-    @is_rtl = @form_field_jq.hasClass "chzn-rtl"
+    @current_selectedIndex = @form_field.selectedIndex
+    @is_rtl = @form_field_jq.hasClass "chosen-rtl"
     @overflow_container = if typeof @overflow_container is "undefined" then @form_field_jq.parent() else @overflow_container
 
-  finish_setup: ->
-    @form_field_jq.addClass "chzn-done"
-
   set_up_html: ->
-    @container_id = if @form_field.id.length then @form_field.id.replace(/[^\w]/g, '_') else this.generate_field_id()
-    @container_id += "_chzn"
+    container_classes = ["chosen-container"]
+    container_classes.push "chosen-container-" + (if @is_multiple then "multi" else "single")
+    container_classes.push @form_field.className if @inherit_select_classes && @form_field.className
+    container_classes.push "chosen-rtl" if @is_rtl
 
-    @f_width = @form_field_jq.outerWidth()
+    container_props =
+      'class': container_classes.join ' '
+      'style': "width: #{this.container_width()};"
+      'title': @form_field.title
 
-    container_div = ($ "<div />", {
-      id: @container_id
-      class: "chzn-container#{ if @is_rtl then ' chzn-rtl' else '' }"
-      style: 'width: ' + (@f_width) + 'px;' #use parens around @f_width so coffeescript doesn't think + ' px' is a function parameter
-    })
+    container_props.id = @form_field.id.replace(/[^\w]/g, '_') + "_chosen" if @form_field.id.length
+
+    @container = ($ "<div />", container_props)
 
     if @is_multiple
-      container_div.html '<ul class="chzn-choices"><li class="search-field"><input type="text" value="' + @default_text + '" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="chzn-drop" style="left:-9000px; display: none;"><ul class="chzn-results"></ul></div>'
+      choices_class = ['chosen-choices']
+      @container.html '<ul class="' + choices_class.join(' ') + '"><li class="search-field"><input type="text" value="' + @default_text + '" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="chosen-drop"><ul class="chosen-results"></ul></div>'
     else
-      container_div.html '<a href="javascript:void(0)" class="chzn-single chzn-default"><span>' + @default_text + '</span><div><b></b></div></a><div class="chzn-drop" style="left:-9000px; display: none;"><div class="chzn-search"><input type="text" autocomplete="off" /></div><ul class="chzn-results"></ul></div>'
+      @container.html '<a class="chosen-single chosen-default" tabindex="-1"><span>' + @default_text + '</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul><div class="search-state"></div><div class="overflow"></div></div><ul class="chosen-results"></ul></div>'
 
-    @form_field_jq.hide().after container_div
-    @container = ($ '#' + @container_id)
-    @container.addClass( "chzn-container-" + (if @is_multiple then "multi" else "single") )
-    @dropdown = @container.find('div.chzn-drop').first()
-
-    dd_top = @container.height()
-    dd_width = (@f_width - get_side_border_padding(@dropdown))
-
-    @dropdown.css({"width": dd_width  + "px", "top": dd_top + "px"})
+    @form_field_jq.hide().after @container
+    @dropdown = @container.find('div.chosen-drop').first()
 
     if @overflow_container
       $( @overflow_container ).on "scroll", (evt) => @update_position(evt)
 
     @search_field = @container.find('input').first()
-    @search_results = @container.find('ul.chzn-results').first()
-    this.search_field_scale()
+    @search_results = @container.find('ul.chosen-results').first()
 
     @search_no_results = @container.find('li.no-results').first()
 
     if @is_multiple
-      @search_choices = @container.find('ul.chzn-choices').first()
+      @search_choices = @container.find('ul.chosen-choices').first()
       @search_container = @container.find('li.search-field').first()
     else
-      @search_container = @container.find('div.chzn-search').first()
-      @selected_item = @container.find('.chzn-single').first()
-      sf_width = dd_width - get_side_border_padding(@search_container) - get_side_border_padding(@search_field)
-      @search_field.css( {"width" : sf_width + "px"} )
+      @search_container = @container.find('li.search-field').first()
+      @search_scroller = @container.find('ul.chosen-scopes')
+      @selected_item = @container.find('.chosen-single').first()
+    
+    this.results_build () ->
+      this.set_tab_index()
+      this.set_label_behavior()
+      @form_field_jq.trigger("chosen:ready", {chosen: this})
 
-    this.results_build()
-    this.set_tab_index()
 
     $("body").append( @dropdown )
 
-    @form_field_jq.trigger("liszt:ready", {chosen: this})
-
   register_observers: ->
-    @container.mousedown (evt) => this.container_mousedown(evt)
-    @container.mouseup (evt) => this.container_mouseup(evt)
-    @container.mouseenter (evt) => this.mouse_enter(evt)
-    @container.mouseleave (evt) => this.mouse_leave(evt)
+    @container.bind 'mousedown.chosen', (evt) => this.container_mousedown(evt); return
+    @container.bind 'mouseup.chosen', (evt) => this.container_mouseup(evt); return
+    @container.bind 'mouseenter.chosen', (evt) => this.mouse_enter(evt); return
+    @container.bind 'mouseleave.chosen', (evt) => this.mouse_leave(evt); return
 
-    @container.find(".chzn-single").focus (evt) =>
-      @dropdown.css "display": "block"
-      @search_field.focus()
+    @search_results.bind 'mouseup.chosen', (evt) => this.search_results_mouseup(evt); return
+    @search_results.bind 'mouseover.chosen', (evt) => this.search_results_mouseover(evt); return
+    @search_results.bind 'mouseout.chosen', (evt) => this.search_results_mouseout(evt); return
+    @search_results.bind 'mousewheel.chosen DOMMouseScroll.chosen', (evt) => this.search_results_mousewheel(evt); return
 
-    @dropdown.mouseenter (evt) => this.mouse_enter(evt)
-    @dropdown.mouseleave (evt) => this.mouse_leave(evt)
+    @search_results.bind 'touchstart.chosen', (evt) => this.search_results_touchstart(evt); return
+    @search_results.bind 'touchmove.chosen', (evt) => this.search_results_touchmove(evt); return
+    @search_results.bind 'touchend.chosen', (evt) => this.search_results_touchend(evt); return
 
-    @search_results.mouseup (evt) => this.search_results_mouseup(evt)
-    @search_results.mouseover (evt) => this.search_results_mouseover(evt)
-    @search_results.mouseout (evt) => this.search_results_mouseout(evt)
 
-    @form_field_jq.bind "liszt:updated", (evt) => this.results_update_field(evt)
+    @form_field_jq.bind "chosen:updated.chosen", (evt) => this.results_update_field(evt); return
+    @form_field_jq.bind "chosen:activate.chosen", (evt) => this.activate_field(evt); return
+    @form_field_jq.bind "chosen:open.chosen", (evt) => this.container_mousedown(evt); return
 
-    @search_field.blur (evt) => this.input_blur(evt)
-    @search_field.keyup (evt) => this.keyup_checker(evt)
-    @search_field.keydown (evt) => this.keydown_checker(evt)
+    if @search_scroller
+      @search_scroller.bind 'click.chosen', (evt) => this.activate_field(evt); return
+    
+    @search_field.bind 'blur.chosen', (evt) => this.input_blur(evt); return
+    @search_field.bind 'keyup.chosen', (evt) => this.keyup_checker(evt); return
+    @search_field.bind 'keydown.chosen', (evt) => this.keydown_checker(evt); return
+    @search_field.bind 'focus.chosen', (evt) => this.input_focus(evt); return
 
     if @is_multiple
-      @search_choices.click (evt) => this.choices_click(evt)
-      @search_field.focus (evt) => this.input_focus(evt)
+      @search_choices.bind 'click.chosen', (evt) => this.choices_click(evt); return
     else
-      @container.click (evt) => evt.preventDefault() # gobble click of anchor
+      @container.bind 'click.chosen', (evt) -> evt.preventDefault(); return # gobble click of anchor
+
+  destroy: ->
+    $(document).unbind "click.chosen", @click_test_action
+    if @search_field[0].tabIndex
+      @form_field_jq[0].tabIndex = @search_field[0].tabIndex
+
+    @container.remove()
+    @form_field_jq.removeData('chosen')
+    @form_field_jq.show()
 
   search_field_disabled: ->
     @is_disabled = @form_field_jq[0].disabled
     if(@is_disabled)
-      @container.addClass 'chzn-disabled'
+      @container.addClass 'chosen-disabled'
       @search_field[0].disabled = true
-      @selected_item.unbind "focus", @activate_action if !@is_multiple
+      @selected_item.unbind "focus.chosen", @activate_action if !@is_multiple
       this.close_field()
     else
-      @container.removeClass 'chzn-disabled'
+      @container.removeClass 'chosen-disabled'
       @search_field[0].disabled = false
-      @selected_item.bind "focus", @activate_action if !@is_multiple
+      @selected_item.bind "focus.chosen", @activate_action if !@is_multiple
 
   container_mousedown: (evt) ->
     if !@is_disabled
-      target_closelink =  if evt? then ($ evt.target).hasClass "search-choice-close" else false
       if evt and evt.type is "mousedown" and not @results_showing
-        evt.stopPropagation()
-      if not @pending_destroy_click and not target_closelink
+        evt.preventDefault()
+
+      if not (evt? and ($ evt.target).hasClass "search-choice-close")
         if not @active_field
           @search_field.val "" if @is_multiple
-          $(document).click @click_test_action
+          $(document).bind 'click.chosen', @click_test_action
           this.results_show()
-        else if not @is_multiple and evt and (($(evt.target)[0] == @selected_item[0]) || $(evt.target).parents("a.chzn-single").length)
+        else if not @is_multiple and evt and (($(evt.target)[0] == @selected_item[0]) || $(evt.target).parents("a.chosen-single").length)
           evt.preventDefault()
           this.results_toggle()
 
         this.activate_field()
-      else
-        @pending_destroy_click = false
 
   container_mouseup: (evt) ->
     this.results_reset(evt) if evt.target.nodeName is "ABBR" and not @is_disabled
 
+  search_results_mousewheel: (evt) ->
+    delta = -evt.originalEvent?.wheelDelta or evt.originialEvent?.detail
+    if delta?
+      evt.preventDefault()
+      delta = delta * 40 if evt.type is 'DOMMouseScroll'
+      @search_results.scrollTop(delta + @search_results.scrollTop())
+
   blur_test: (evt) ->
-    this.close_field() if not @active_field and @container.hasClass "chzn-container-active"
+    this.close_field() if not @active_field and @container.hasClass "chosen-container-active"
 
   close_field: ->
-    $(document).unbind "click", @click_test_action
-
-    if not @is_multiple
-      @selected_item.attr "tabindex", @search_field.attr("tabindex")
-      @search_field.attr "tabindex", -1
+    $(document).unbind "click.chosen", @click_test_action
 
     @active_field = false
     this.results_hide()
 
-    @container.removeClass "chzn-container-active"
-    this.winnow_results_clear()
+    @container.removeClass "chosen-container-active"
     this.clear_backstroke()
 
     this.show_search_field_default()
     this.search_field_scale()
 
   activate_field: ->
-    if not @is_multiple and not @active_field
-      @search_field.attr "tabindex", (@selected_item.attr "tabindex")
-      @selected_item.attr "tabindex", -1
-
-    @container.addClass "chzn-container-active"
+    @container.addClass "chosen-container-active"
     @active_field = true
 
     @search_field.val(@search_field.val())
@@ -172,51 +177,36 @@ class Chosen extends AbstractChosen
 
 
   test_active_click: (evt) ->
-    if $(evt.target).parents('#' + @container_id + ', .chzn-drop').length
+    if @container.is($(evt.target).closest('.chosen-container'))
       @active_field = true
     else
       this.close_field()
 
-  results_build: ->
+  results_build: (cb) ->
     @parsing = true
-    @results_data = root.SelectParser.select_to_array @form_field
+    @selected_option_count = null
 
-    if @is_multiple and @choices > 0
-      @search_choices.find("li.search-choice").remove()
-      @choices = 0
-    else if not @is_multiple
-      @selected_item.addClass("chzn-default").find("span").text(@default_text)
-      if @form_field.options.length <= @disable_search_threshold
-        @dropdown.addClass "chzn-container-single-nosearch"
-      else
-        @dropdown.removeClass "chzn-container-single-nosearch"
+    this.search () ->
+      if @is_multiple
+        @search_choices.find("li.search-choice").remove()
+      else if not @is_multiple
+        this.single_set_selected_text()
+        if @disable_search or @results_data.length <= @disable_search_threshold
+          @search_field[0].readOnly = true
+          @container.addClass "chosen-container-single-nosearch"
+        else
+          @search_field[0].readOnly = false
+          @container.removeClass "chosen-container-single-nosearch"
 
-    content = ''
-    for data in @results_data
-      if data.group
-        content += this.result_add_group data
-      else if !data.empty
-        content += this.result_add_option data
-        if data.selected and @is_multiple
-          this.choice_build data
-        else if data.selected and not @is_multiple
-          @selected_item.removeClass("chzn-default").find("span").text data.text
-          this.single_deselect_control_build() if @allow_single_deselect
+      this.update_results_content this.results_option_build({first:true})
 
-    this.search_field_disabled()
-    this.show_search_field_default()
-    this.search_field_scale()
+      this.search_field_disabled()
+      this.show_search_field_default()
+      this.search_field_scale()
 
-    @search_results.html content
-    @parsing = false
-
-
-  result_add_group: (group) ->
-    if not group.disabled
-      group.dom_id = @container_id + "_g_" + group.array_index
-      '<li id="' + group.dom_id + '" class="group-result">' + $("<div />").text(group.label).html() + '</li>'
-    else
-      ""
+      @parsing = false
+  
+      cb.call(this) if cb?
 
   result_do_highlight: (el) ->
     if el.length
@@ -242,12 +232,8 @@ class Chosen extends AbstractChosen
     @result_highlight = null
 
   results_show: ->
-    if not @is_multiple
-      @selected_item.addClass "chzn-single-with-drop"
-      if @result_single_selected
-        this.result_do_highlight( @result_single_selected )
-    else if @max_selected_options <= @choices
-      @form_field_jq.trigger("liszt:maxselected", {chosen: this})
+    if @is_multiple and @max_selected_options <= this.choices_count()
+      @form_field_jq.trigger("chosen:maxselected", {chosen: this})
       return false
 
     @results_showing = true
@@ -263,7 +249,7 @@ class Chosen extends AbstractChosen
     if @results_showing
       dd_top = if @is_multiple then @container.height() else (@container.height() - 1)
       offset = @container.offset()
-      @form_field_jq.trigger("liszt:showing_dropdown", {chosen: this})
+      @form_field_jq.trigger("chosen:showing_dropdown", {chosen: this})
       @dropdown.css {
         "top": (offset.top + dd_top) + "px",
         "left": offset.left + "px",
@@ -282,11 +268,14 @@ class Chosen extends AbstractChosen
       @dropdown.css("maxHeight", maxHeight + "px")
       @search_results.css("maxHeight", ( maxHeight - @search_container.height() - 10 ) + "px")
 
+  update_results_content: (content) ->
+    @search_results.html content
+
   results_hide: ->
-    @selected_item.removeClass "chzn-single-with-drop" unless @is_multiple
+    @selected_item.removeClass "chosen-single-with-drop" unless @is_multiple
     this.result_clear_highlight()
     @search_results.scrollTop(0);
-    @form_field_jq.trigger("liszt:hiding_dropdown", {chosen: this})
+    @form_field_jq.trigger("chosen:hiding_dropdown", {chosen: this})
     @dropdown.css {
       "left" : "-9000px",
       "display" : "none"
@@ -295,18 +284,21 @@ class Chosen extends AbstractChosen
 
 
   set_tab_index: (el) ->
-    if @form_field_jq.attr "tabindex"
-      ti = @form_field_jq.attr "tabindex"
-      @form_field_jq.attr "tabindex", -1
+    if @form_field.tabIndex
+      ti = @form_field.tabIndex
+      @form_field.tabIndex = -1
+      @search_field[0].tabIndex = ti
 
-      if @is_multiple
-        @search_field.attr "tabindex", ti
-      else
-        @selected_item.attr "tabindex", ti
-        @search_field.attr "tabindex", -1
+  set_label_behavior: ->
+    @form_field_label = @form_field_jq.parents("label") # first check for a parent label
+    if not @form_field_label.length and @form_field.id.length
+      @form_field_label = $("label[for='#{@form_field.id}']") #next check for a for=#{id}
+
+    if @form_field_label.length > 0
+      @form_field_label.bind 'click.chosen', (evt) => if @is_multiple then this.container_mousedown(evt) else this.activate_field()
 
   show_search_field_default: ->
-    if @is_multiple and @choices < 1 and not @active_field
+    if @is_multiple and this.choices_count() < 1 and not @active_field
       @search_field.val(@default_text)
       @search_field.addClass "default"
     else
@@ -318,6 +310,7 @@ class Chosen extends AbstractChosen
     if target.length
       @result_highlight = target
       this.result_select(evt)
+      @search_field.focus()
 
   search_results_mouseover: (evt) ->
     target = if $(evt.target).hasClass "active-result" then $(evt.target) else $(evt.target).parents(".active-result").first()
@@ -326,179 +319,175 @@ class Chosen extends AbstractChosen
   search_results_mouseout: (evt) ->
     this.result_clear_highlight() if $(evt.target).hasClass "active-result" or $(evt.target).parents('.active-result').first()
 
-
-  choices_click: (evt) ->
-    evt.preventDefault()
-    if( @active_field and not($(evt.target).hasClass "search-choice" or $(evt.target).parents('.search-choice').first) and not @results_showing )
-      this.results_show()
-
+  scope_build: (item) ->
+    this.choice_build item
+    this.result_narrow item
+    
   choice_build: (item) ->
-    if @is_multiple and @max_selected_options <= @choices
-      @form_field_jq.trigger("liszt:maxselected", {chosen: this})
-      return false # fire event
-    choice_id = @container_id + "_c_" + item.array_index
-    @choices += 1
-    @search_container.before  '<li class="search-choice" id="' + choice_id + '"><span>' + item.html + '</span><a href="javascript:void(0)" class="search-choice-close" rel="' + item.array_index + '"></a></li>'
-    link = $('#' + choice_id).find("a").first()
-    link.click (evt) => this.choice_destroy_link_click(evt)
+    choice = $('<li />', { class: "search-choice" }).html("<span>#{item.html}</span>")
+
+    choice.addClass 'is-scope' if item.is_scope
+    
+    if item.disabled
+      choice.addClass 'search-choice-disabled'
+    else
+      close_link = $('<a />', { class: 'search-choice-close', 'data-option-array-index': item.array_index })
+      close_link.bind 'click.chosen', (evt) => this.choice_destroy_link_click(evt)
+      choice.append close_link
+    
+    @search_container.before choice
 
   choice_destroy_link_click: (evt) ->
     evt.preventDefault()
-    if not @is_disabled
-      @pending_destroy_click = true
-      this.choice_destroy $(evt.target)
-    else
-      evt.stopPropagation
+    evt.stopPropagation()
+    this.choice_destroy $(evt.target) unless @is_disabled
 
   choice_destroy: (link) ->
-    @choices -= 1
-    this.show_search_field_default()
+    array_index = link[0].getAttribute("data-option-array-index")
+    item = @source.get_item(array_index)
+    
+    deselected = if item.is_scope then this.result_expand(item) else this.result_deselect(array_index)
+    
+    if deselected
+      this.show_search_field_default()
 
-    this.results_hide() if @is_multiple and @choices > 0 and @search_field.val().length < 1
+      this.results_hide() if @is_multiple and this.choices_count() > 0 and @search_field.val().length < 1
+      
+      this.winnow_results() if item.is_scope
 
-    this.result_deselect (link.attr "rel")
-    link.parents('li').first().remove()
+      link.parents('li').first().remove()
+      
+      this.search_field_scale()
 
   results_reset: ->
+    this.reset_single_select_options()
     @form_field.options[0].selected = true
-    @selected_item.find("span").text @default_text
-    @selected_item.addClass("chzn-default") if not @is_multiple
+    this.single_set_selected_text()
     this.show_search_field_default()
     this.results_reset_cleanup()
     @form_field_jq.trigger "change"
     this.results_hide() if @active_field
 
   results_reset_cleanup: ->
+    @current_selectedIndex = @form_field.selectedIndex
     @selected_item.find("abbr").remove()
 
   result_select: (evt) ->
     if @result_highlight
       high = @result_highlight
-      high_id = high.attr "id"
 
       this.result_clear_highlight()
 
-      if @is_multiple
-        this.result_deactivate high
-      else
-        @search_results.find(".result-selected").removeClass "result-selected"
-        @result_single_selected = high
-        @selected_item.removeClass("chzn-default")
-
-      high.addClass "result-selected"
-
-      position = high_id.substr(high_id.lastIndexOf("_") + 1 )
-      item = @results_data[position]
-      item.selected = true
-
-      @form_field.options[item.options_index].selected = true
+      if @is_multiple and @max_selected_options <= this.choices_count()
+        @form_field_jq.trigger("chosen:maxselected", {chosen: this})
+        return false
 
       if @is_multiple
-        this.choice_build item
+        high.removeClass("active-result")
       else
-        @selected_item.find("span").first().text item.text
-        this.single_deselect_control_build() if @allow_single_deselect
+        this.reset_single_select_options()
 
-      this.results_hide() unless evt.metaKey and @is_multiple
+      item = @source.get_item(high[0].getAttribute("data-option-array-index"))
+      
+      # Don't actually select anything if this is a refinement
+      if item.is_scope
+        this.scope_build item
+      else
+        item.selected = true
 
+        @source.get_option_element(item.array_index).selected = true
+        @selected_option_count = null
+
+        if @is_multiple
+          this.choice_build item
+        else
+          this.single_set_selected_text(item.text)
+        
       @search_field.val ""
-
-      @form_field_jq.trigger "change", {'selected': @form_field.options[item.options_index].value}
       this.search_field_scale()
+      
+      if item.is_scope
+        @search_field.focus()
 
-  result_activate: (el) ->
-    el.addClass("active-result")
+        this.result_clear_highlight()
+        # Search for refinement
+        this.winnow_results() if @results_showing
+      else
+        this.results_hide() unless (evt.metaKey or evt.ctrlKey) and @is_multiple
 
-  result_deactivate: (el) ->
-    el.removeClass("active-result")
+        @form_field_jq.trigger "change", {'selected': item.value} if @is_multiple || @form_field.selectedIndex != @current_selectedIndex
+        @current_selectedIndex = @form_field.selectedIndex
 
-  result_deselect: (pos) ->
-    result_data = @results_data[pos]
-    result_data.selected = false
+  single_set_selected_text: (text=@default_text) ->
+    if text is @default_text
+      @selected_item.addClass("chosen-default")
+    else
+      this.single_deselect_control_build()
+      @selected_item.removeClass("chosen-default")
 
-    @form_field.options[result_data.options_index].selected = false
-    result = $("#" + @container_id + "_o_" + pos)
-    result.removeClass("result-selected").addClass("active-result").show()
+    @selected_item.find("span").text(text)
 
-    this.result_clear_highlight()
-    this.winnow_results()
-
-    @form_field_jq.trigger "change", {deselected: @form_field.options[result_data.options_index].value}
+    this.result_scopes_build()
     this.search_field_scale()
 
-  single_deselect_control_build: ->
-    @selected_item.find("span").first().after "<abbr class=\"search-choice-close\"></abbr>" if @allow_single_deselect and @selected_item.find("abbr").length < 1
+  result_narrow: (item) ->
+    @scopes.push(item.value)
+  
+  result_expand: (item) ->
+    for v, i in @scopes by -1
+      if v == item.value
+        @scopes = @scopes.slice(0, i)
+        return true
+    return false
 
-  winnow_results: ->
-    this.no_results_clear()
+  result_clear_scope: ->
+    @scopes = []
+    @search_container.siblings("li.is-scope").remove()
+    
+  result_scopes_build: ->
+    this.result_clear_scope()
+    if not @is_multiple
+      h = []
+      v = @source.get_item_by_value(@form_field_jq.val())
+      while v? and v.in_scope? and (v = @source.get_item_by_value(v.in_scope))?
+        h.push(v)
+      this.scope_build v for v in h by -1
+    
+  result_deselect: (array_index) ->
+    option = @source.get_option_element(array_index)
 
-    results = 0
+    if not option.disabled
+      option_value = option.value
 
-    searchText = if @search_field.val() is @default_text then "" else $('<div/>').text($.trim(@search_field.val())).html()
-    regexAnchor = if @search_contains then "" else "^"
-    regex = new RegExp(regexAnchor + searchText.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"), 'i')
-    zregex = new RegExp(searchText.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"), 'i')
+      @source.get_item(array_index).selected = false
 
-    for option in @results_data
-      if not option.disabled and not option.empty
-        if option.group
-          $('#' + option.dom_id).css('display', 'none')
-        else if not (@is_multiple and option.selected)
-          found = false
-          result_id = option.dom_id
-          result = $("#" + result_id)
+      option.selected = false
+      @selected_option_count = null
 
-          if regex.test option.html
-            found = true
-            results += 1
-          else if option.html.indexOf(" ") >= 0 or option.html.indexOf("[") == 0
-            #TODO: replace this substitution of /\[\]/ with a list of characters to skip.
-            parts = option.html.replace(/\[|\]/g, "").split(" ")
-            if parts.length
-              for part in parts
-                if regex.test part
-                  found = true
-                  results += 1
+      this.result_clear_highlight()
+      this.winnow_results() if @results_showing
 
-          if found
-            if searchText.length
-              startpos = option.html.search zregex
-              text = option.html.substr(0, startpos + searchText.length) + '</em>' + option.html.substr(startpos + searchText.length)
-              text = text.substr(0, startpos) + '<em>' + text.substr(startpos)
-            else
-              text = option.html
+      @form_field_jq.trigger "change", {deselected: option_value}
+      this.search_field_scale()
 
-            result.html(text)
-            this.result_activate result
-
-            $("#" + @results_data[option.group_array_index].dom_id).css('display', 'list-item') if option.group_array_index?
-          else
-            this.result_clear_highlight() if @result_highlight and result_id is @result_highlight.attr 'id'
-            this.result_deactivate result
-
-    if results < 1 and searchText.length
-      this.no_results searchText
+      return true
     else
-      this.winnow_results_set_highlight()
+      return false
 
-  winnow_results_clear: ->
-    @search_field.val ""
-    lis = @search_results.find("li")
+  single_deselect_control_build: ->
+    return unless @allow_single_deselect
+    @selected_item.find("span").first().after "<abbr class=\"search-choice-close\"></abbr>" unless @selected_item.find("abbr").length
+    @selected_item.addClass("chosen-single-with-deselect")
 
-    for li in lis
-      li = $(li)
-      if li.hasClass "group-result"
-        li.css('display', 'auto')
-      else if not @is_multiple or not li.hasClass "result-selected"
-        this.result_activate li
+  get_search_text: ->
+    if @search_field.val() is @default_text then "" else $('<div/>').text($.trim(@search_field.val())).html()
 
   winnow_results_set_highlight: ->
-    if not @result_highlight
 
-      selected_results = if not @is_multiple then @search_results.find(".result-selected.active-result") else []
-      do_high = if selected_results.length then selected_results.first() else @search_results.find(".active-result").first()
+    selected_results = if not @is_multiple then @search_results.find(".result-selected.active-result") else []
+    do_high = if selected_results.length then selected_results.first() else @search_results.find(".active-result").first()
 
-      this.result_do_highlight do_high if do_high?
+    this.result_do_highlight do_high if do_high?
 
   no_results: (terms) ->
     no_results_html = $('<li class="no-results">' + @results_none_found + ' "<span></span>"</li>')
@@ -510,13 +499,11 @@ class Chosen extends AbstractChosen
     @search_results.find(".no-results").remove()
 
   keydown_arrow: ->
-    if not @result_highlight
-      first_active = @search_results.find("li.active-result").first()
-      this.result_do_highlight $(first_active) if first_active
-    else if @results_showing
+    if @results_showing and @result_highlight
       next_sib = @result_highlight.nextAll("li.active-result").first()
       this.result_do_highlight next_sib if next_sib
-    this.results_show() if not @results_showing
+    else
+      this.results_show()
 
   keyup_arrow: ->
     if not @results_showing and not @is_multiple
@@ -527,7 +514,7 @@ class Chosen extends AbstractChosen
       if prev_sibs.length
         this.result_do_highlight prev_sibs.first()
       else
-        this.results_hide() if @choices > 0
+        this.results_hide() if this.choices_count() > 0
         this.result_clear_highlight()
 
   keydown_backstroke: ->
@@ -535,8 +522,13 @@ class Chosen extends AbstractChosen
       this.choice_destroy @pending_backstroke.find("a").first()
       this.clear_backstroke()
     else
-      @pending_backstroke = @search_container.siblings("li.search-choice").last()
-      @pending_backstroke.addClass "search-choice-focus"
+      next_available_destroy = @search_container.siblings("li.search-choice").last()
+      if next_available_destroy.length and not next_available_destroy.hasClass("search-choice-disabled")
+        @pending_backstroke = next_available_destroy
+        if @single_backstroke_delete
+          @keydown_backstroke()
+        else
+          @pending_backstroke.addClass "search-choice-focus"
 
   clear_backstroke: ->
     @pending_backstroke.removeClass "search-choice-focus" if @pending_backstroke
@@ -564,11 +556,12 @@ class Chosen extends AbstractChosen
         this.keyup_arrow()
         break
       when 40
+        evt.preventDefault()
         this.keydown_arrow()
         break
 
   search_field_scale: ->
-    if @is_multiple
+    if true #@is_multiple
       h = 0
       w = 0
 
@@ -585,19 +578,37 @@ class Chosen extends AbstractChosen
       w = div.width() + 25
       div.remove()
 
-      if( w > @f_width-10 )
-        w = @f_width - 10
+      f_width = @container.outerWidth()
+
+      if( w > f_width - 10 )
+        w = f_width - 10
 
       @search_field.css({'width': w + 'px'})
       @update_position()
 
-  generate_random_id: ->
-    string = "sel" + this.generate_random_char() + this.generate_random_char() + this.generate_random_char()
-    while $("#" + string).length > 0
-      string += this.generate_random_char()
-    string
+      if @search_scroller
+        cw = @search_scroller[0].scrollWidth
 
-get_side_border_padding = (elmt) ->
-  side_border_padding = elmt.outerWidth() - elmt.width()
+        @search_scroller.scrollLeft(cw - w)
 
-root.get_side_border_padding = get_side_border_padding
+        this.overflowing(cw > @search_scroller.width())
+
+  loading: (loading) ->
+    return @is_loading if not loading? or @is_loading == loading
+
+    if loading
+      @container.addClass('loading')
+    else
+      @container.removeClass('loading')
+
+    @is_loading = loading
+
+  overflowing: (overflowing) ->
+    return @is_overflowing if not overflowing? or @is_overflowing == overflowing
+
+    if overflowing
+      @container.addClass('overflowing')
+    else
+      @container.removeClass('overflowing')
+
+    @is_overflowing = overflowing

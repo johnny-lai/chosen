@@ -1,0 +1,10 @@
+.chosen-container-single{
+  .chosen-search {
+    .chosen-scopes {
+      & li {
+        display: inline;
+        vertical-align: middle;
+      }
+    }
+  }
+}

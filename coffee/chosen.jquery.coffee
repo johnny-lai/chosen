@@ -251,6 +251,7 @@ class Chosen extends AbstractChosen
 
     @search_field.focus()
     @search_field.val @search_field.val()
+    this.search_field_scale()
 
     this.winnow_results()
 

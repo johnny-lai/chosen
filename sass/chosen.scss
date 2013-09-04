@@ -103,6 +103,31 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
   &.chosen-disabled .chosen-single abbr:hover {
     background-position: -42px -10px;
   }
+  .chosen-single-with-scopes {
+    overflow: auto;
+    height: auto;
+    white-space: normal;
+    @include background(linear-gradient(top, #fff 20%, #f6f6f6 40%, #eee 60%, #f4f4f4 100%));
+
+    span {
+      overflow: auto;
+      white-space: normal;
+      height: auto;
+      .chosen-scopes {
+        overflow: auto;
+        white-space: normal;
+        width: 100%;
+        height: auto;
+        li {
+          margin: 0;
+        }
+        li.is-scope {
+          padding-right: 17px !important;
+          @include background($chosen-edge no-repeat 100% -27px);
+        }
+      }
+    }
+  }
   .chosen-single div {
     position: absolute;
     top: 0;
@@ -147,55 +172,55 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
       padding: 0;
       margin: 0;
     }
-    .chosen-scopes {
-      position: relative;
-      overflow: hidden;
-      margin: 0 20px 0 0;
-      padding: 0;
-      cursor: text;
-    }
-    .chosen-scopes {
-      height: 25px;
-      & li {
-        display: inline-block;
-        list-style: none;
-        &.search-field {
-          position: relative;
-          top: 0;
-          margin: 0;
-          padding: 0;
-          white-space: nowrap;
-          input[type="text"] {
-            @include box-sizing(border-box);
-            margin: 1px 0;
-            padding: 2px 4px 4px;
-            outline: 0;
-            border: 0 !important;
-            background: transparent !important;
-            box-shadow: none;
-            color: #666;
-            font-size: 100%;
-            font-family: sans-serif;
-            line-height: normal;
-            border-radius: 0;
-          }
-          .default {
-            color: #999;
-          }
-        }
-        &.search-choice {
-          position: relative;
-          margin: 0;
-          padding: 5px 0 5px 5px;
-          background-color: #e4e4e4;
-          color: #333;
+  }
+  .chosen-scopes {
+    position: relative;
+    overflow: hidden;
+    margin: 0 20px 0 0;
+    padding: 0;
+    cursor: text;
+  }
+  .chosen-scopes {
+    height: 25px;
+    & li {
+      display: inline-block;
+      list-style: none;
+      &.search-field {
+        position: relative;
+        top: 0;
+        margin: 0;
+        padding: 0;
+        white-space: nowrap;
+        input[type="text"] {
+          @include box-sizing(border-box);
+          margin: 1px 0;
+          padding: 2px 4px 4px;
+          outline: 0;
+          border: 0 !important;
+          background: transparent !important;
+          box-shadow: none;
+          color: #666;
           font-size: 100%;
           font-family: sans-serif;
           line-height: normal;
+          border-radius: 0;
+        }
+        .default {
+          color: #999;
+        }
+      }
+      &.search-choice {
+        position: relative;
+        margin: 0;
+        padding: 5px 0 5px 5px;
+        background-color: #e4e4e4;
+        color: #333;
+        font-size: 100%;
+        font-family: sans-serif;
+        line-height: normal;
 
-          .search-choice-close {
-            display: none;
-          }
+        .search-choice-close {
+          display: none;
         }
       }
     }

@@ -20,6 +20,7 @@ class AbstractChosen
     @results_showing = false
     @result_highlighted = null
     @allow_single_deselect = if @options.allow_single_deselect? and @form_field.options[0]? and @form_field.options[0].text is "" then @options.allow_single_deselect else false
+    @show_scope_of_selected_item = @options.show_scope_of_selected_item || false
     @disable_search_threshold = @options.disable_search_threshold || 0
     @disable_search = @options.disable_search || false
     @enable_split_word_search = if @options.enable_split_word_search? then @options.enable_split_word_search else true

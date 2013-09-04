@@ -567,8 +567,14 @@
          <em>Single select with a function data source</em>
           <select class="chosen-source-function" style="width:350px;">
             <option value></option>
-            <option value="Scope of d" data='{"is_scope":true}'>Scope of d</option>
-            <option value="d (0)" selected data='{"in_scope": "Scope of d"}'>d (0)</option>
+            <option value="z-0" data='{"is_scope":true}'>zzzzz-0</option>
+            <option value="z-1" data='{"is_scope":true,"in_scope":"z-0"}'>zzzzzzzz-1</option>
+            <option value="z-2" data='{"is_scope":true,"in_scope":"z-1"}'>zzzzzzzz-2</option>
+            <option value="z-3" data='{"is_scope":true,"in_scope":"z-2"}'>zzzzzzz-3</option>
+            <option value="z-4" data='{"is_scope":true,"in_scope":"z-3"}'>zzzzzzzzzz-4</option>
+            <option value="z-5" data='{"is_scope":true,"in_scope":"z-4"}'>zzzzzzzzzz-5</option>
+            <option value="z-6" data='{"is_scope":true,"in_scope":"z-5"}'>zzzzzzzzzz-6</option>
+            <option value="d (0)" selected data='{"in_scope": "z-6"}'>Sample</option>
           </select>
         </div>
         <div>
@@ -1574,6 +1580,7 @@
         source: source['string']
       },
       '.chosen-source-function'  : {
+        show_scope_of_selected_item: true,
         allow_single_deselect: true,
         source: source['function']
       }

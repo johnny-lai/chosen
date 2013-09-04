@@ -47,7 +47,9 @@ class Chosen extends AbstractChosen
       choices_class = ['chosen-choices']
       @container.html '<ul class="' + choices_class.join(' ') + '"><li class="search-field"><input type="text" value="' + @default_text + '" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="' + drop_classes.join(' ') + '"><ul class="chosen-results"></ul></div>'
     else
-      @container.html '<a class="chosen-single chosen-default" tabindex="-1"><span>' + @default_text + '</span><div><b></b></div></a><div class="' + drop_classes.join(' ') + '"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul><div class="search-state"></div><div class="overflow"></div></div><ul class="chosen-results"></ul></div>'
+      a_classes = ['chosen-single', 'chosen-default']
+      a_classes.push('chosen-single-with-scopes') if @options.show_scope_of_selected_item
+      @container.html '<a class="' + a_classes.join(' ') + '" tabindex="-1"><span>' + @default_text + '</span><div><b></b></div></a><div class="' + drop_classes.join(' ') + '"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul><div class="search-state"></div><div class="overflow"></div></div><ul class="chosen-results"></ul></div>'
 
     @form_field_jq.hide().after @container
     @dropdown = @container.find('div.chosen-drop').first()
@@ -435,9 +437,18 @@ class Chosen extends AbstractChosen
       this.single_deselect_control_build()
       @selected_item.removeClass("chosen-default")
 
-    @selected_item.find("span").text(text)
-
+    # Building the results scope will initialize @scopes
     this.result_scopes_build()
+
+    if @options.show_scope_of_selected_item
+      html = '<ul class="chosen-scopes">'
+      html += '<li class="is-scope">' + @source.get_item_by_value(v).html + '</li>' for v in @scopes
+      html += '<li>' + text + '</li>'
+      html += '</ul>'
+      @selected_item.find("span").html(html)
+    else
+      @selected_item.find("span").text(text)
+
     this.search_field_scale()
 
   result_narrow: (item) ->

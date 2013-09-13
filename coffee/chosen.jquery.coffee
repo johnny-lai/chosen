@@ -49,7 +49,7 @@ class Chosen extends AbstractChosen
     else
       a_classes = ['chosen-single', 'chosen-default']
       a_classes.push('chosen-single-with-scopes') if @options.show_scope_of_selected_item
-      @container.html '<a class="' + a_classes.join(' ') + '" tabindex="-1"><span>' + @default_text + '</span><div><b></b></div></a><div class="' + drop_classes.join(' ') + '"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul><div class="search-state"></div><div class="overflow"></div></div><ul class="chosen-results"></ul></div>'
+      @container.html '<a class="' + a_classes.join(' ') + '" tabindex="-1"><span>' + @default_text + '</span><div><b></b></div></a><div class="' + drop_classes.join(' ') + '"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul><div class="chosen-search-state"></div><div class="chosen-overflow"></div></div><ul class="chosen-results"></ul></div>'
 
     @form_field_jq.hide().after @container
     @dropdown = @container.find('div.chosen-drop').first()
@@ -619,9 +619,9 @@ class Chosen extends AbstractChosen
     return @is_loading if not loading? or @is_loading == loading
 
     if loading
-      @containers.addClass('loading')
+      @containers.addClass('chosen-loading')
     else
-      @containers.removeClass('loading')
+      @containers.removeClass('chosen-loading')
 
     @is_loading = loading
 
@@ -629,9 +629,9 @@ class Chosen extends AbstractChosen
     return @is_overflowing if not overflowing? or @is_overflowing == overflowing
 
     if overflowing
-      @containers.addClass('overflowing')
+      @containers.addClass('chosen-overflowing')
     else
-      @containers.removeClass('overflowing')
+      @containers.removeClass('chosen-overflowing')
 
 
     @is_overflowing = overflowing

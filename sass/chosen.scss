@@ -47,8 +47,8 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
       @include background($chosen-edge no-repeat 100% -51px, linear-gradient(#3875d7 20%, #2a62bc 90%));
     }
   }
-  &.overflowing .chosen-search {
-    .overflow {
+  &.chosen-overflowing .chosen-search {
+    .chosen-overflow {
       display: block;
     }
   }
@@ -150,7 +150,7 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
     border: 1px solid #aaa;
     @include background(linear-gradient(#eee 1%, #fff 15%));
 
-    .overflow {
+    .chosen-overflow {
       position: absolute;
       left: 0;
       top: 0;
@@ -160,7 +160,7 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
       display: none;
     }
 
-    .search-state {
+    .chosen-search-state {
       background-color: white;
       @include background($chosen-sprite no-repeat 100% -20px);
       position: absolute;
@@ -515,7 +515,7 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
     background-size: 58px 37px !important;
     background-repeat: no-repeat !important;
   }
-  .chosen-container .overflow {
+  .chosen-container .chosen-overflow {
     background-image: $chosen-edge-retina !important;
     background-size: 15px 76px !important;
   }

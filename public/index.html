@@ -550,6 +550,23 @@
       <h2><a name="source" class="anchor" href="#source">Data Source</a></h2>
       <div class="side-by-side clearfix">
         <div>
+         <em>Single select</em>
+          <select class="chosen-source-select" style="width:350px;">
+            <option value></option>
+            <option value="1" selected data='{"in_scope":"3"}'>Hi</option>
+            <option value="2" data='{"in_scope":"4"}'>Mascot</option>
+            <option value="3" data='{"is_scope":true,"in_scope":"4"}'>Greetings</option>
+            <option value="4" data='{"is_scope":true}'>English</option>
+          </select>
+        </div>
+        <div>
+         <em>Multiple select</em>
+          <select class="chosen-source-select" multiple style="width:350px;">
+          </select>
+        </div>
+      </div>
+      <div class="side-by-side clearfix">
+        <div>
          <em>Single select with an array data source</em>
           <select class="chosen-source-array" style="width:350px;">
             <option value></option>
@@ -1571,8 +1588,13 @@
       '.chosen-select-no-single' : {disable_search_threshold:10},
       '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
       '.chosen-select-width'     : {width:"95%"},
+      '.chosen-source-select'    : {
+        allow_single_deselect: true,
+        show_scope_of_selected_item: true
+      },
       '.chosen-source-array'     : {
         allow_single_deselect: true,
+        show_scope_of_selected_item: true,
         source: source['array']
       },
       '.chosen-source-string'    : {

@@ -54,7 +54,27 @@ class SelectParser
       map[chr] || "&amp;"
   
   search: (chosen, response_cb) ->
-    response_cb this.select_to_array()
+    filter_scope = if not chosen.results_data?
+      # First time search, we use the selected item as the scopes
+      @parsed_by_scopes = {}
+      for item in this.select_to_array()
+        in_scope = item.in_scope
+        if not in_scope?
+          in_scope = null
+        if item.selected
+          scope = item.in_scope
+        @parsed_by_scopes[in_scope] ||= []
+        @parsed_by_scopes[in_scope].push(item)
+      scope
+    else
+      scopes = chosen.get_search_request().scopes
+      if scopes.length
+        scopes[scopes.length - 1]
+
+    filter_scope = null if not filter_scope?
+    results = @parsed_by_scopes[filter_scope]
+    results = [] if not results?
+    response_cb results
 
   select_to_array: ->
     if not @parsed?

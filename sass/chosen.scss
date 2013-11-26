@@ -30,7 +30,7 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
   position: absolute;
   top: 100%;
   left: -9999px;
-  z-index: 1010;
+  z-index: 9999;
   width: 100%;
   border: 1px solid #aaa;
   border-top: 0;
@@ -143,7 +143,7 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
   }
   .chosen-search {
     position: relative;
-    z-index: 1010;
+    z-index: 9999;
     margin: 3px 4px;
     padding: 0;
     white-space: nowrap;

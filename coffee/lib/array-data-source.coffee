@@ -1,12 +1,5 @@
 class ArrayDataSource extends DataSource
 
-  search: (chosen, response_cb) ->
-    if not @results?
-      options = this.select_to_hash('value')
-      @results = []
-      this.add_option options, child for child in @source
-    response_cb @results
-  
   add_option: (options, child) ->
     value = child.value || child
     item = options[value] || {}
@@ -25,8 +18,15 @@ class ArrayDataSource extends DataSource
     this.get_option_element_by_value(this.get_item(array_index).value)
 
   get_item: (array_index) ->
-    @results[array_index]
+    this.items_as_array()[array_index]
     
   get_item_by_value: (value) ->
     return obj for obj in @results when ""+obj.value == ""+value
     null
+
+  items_as_array: () ->
+    if not @results?
+      options = @select_parser.select_to_hash('value')
+      @results = @results = []
+      this.add_option options, child for child in @source
+    @results

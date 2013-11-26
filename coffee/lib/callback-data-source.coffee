@@ -2,7 +2,7 @@ class CallbackDataSource extends DataSource
 
   constructor: (form_field, source) ->
     super(form_field, source)
-    @results = this.select_to_hash('value')
+    @results = @select_parser.select_to_hash('value')
     @cache = {}
     
   search: (chosen, response_cb) ->
@@ -22,7 +22,7 @@ class CallbackDataSource extends DataSource
       else
         response_cb(data)
     else
-      this.did_search(chosen, response_cb, this.select_to_array())
+      this.did_search(chosen, response_cb, this.items_as_array())
   
   perform_search: (chosen, response_cb) ->
     ds = this

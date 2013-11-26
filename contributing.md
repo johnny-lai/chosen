@@ -74,7 +74,7 @@ Example:
 
 **Note:** In an effort to keep open issues to a manageable number, we will close any issues
 that do not provide enough information for us to be able to work on a solution.
-You will be encouraged to reopen it after providing the necessary details.
+You will be encouraged to provide the necessary details, after which we will reopen the issue.
 
 <a name="features"></a>
 ## Feature requests
@@ -109,7 +109,7 @@ otherwise you risk spending a lot of time working on something that the
 project's developers might not want to merge into the project. You can solicit
 feedback and opinions in an open feature request thread or create a new one.
 
-Please use the [git flow for pull requesets](#git-flow) and follow Chosen's 
+Please use the [git flow for pull requests](#git-flow) and follow Chosen's 
 [code conventions](#code-conventions) before submitting your work. Adhering to 
 these guidelines is the best way to get your work included in Chosen.
 

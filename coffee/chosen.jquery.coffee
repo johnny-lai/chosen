@@ -72,9 +72,10 @@ class Chosen extends AbstractChosen
       @search_scroller = @container.find('ul.chosen-scopes')
       @selected_item = @container.find('.chosen-single').first()
     
+    this.set_tab_index()
+    this.set_label_behavior()
+
     this.results_build () ->
-      this.set_tab_index()
-      this.set_label_behavior()
       @form_field_jq.trigger("chosen:ready", {chosen: this})
 
 
@@ -256,16 +257,18 @@ class Chosen extends AbstractChosen
     this.winnow_results()
 
   update_position: ->
+    dd_top = if @is_multiple then @container.height() else (@container.height() - 1)
+    offset = @container.offset()
+    @dropdown.css {
+      "top": (offset.top + dd_top) + "px",
+      "left": offset.left + "px",
+      "width": (this.container.outerWidth(true) - 2) + "px",  # Subtract border because we are *not* in border-box mode
+      "maxHeight": "99999px"
+    }
     if @results_showing
-      dd_top = if @is_multiple then @container.height() else (@container.height() - 1)
-      offset = @container.offset()
       @form_field_jq.trigger("chosen:showing_dropdown", {chosen: this})
       @dropdown.css {
-        "top": (offset.top + dd_top) + "px",
-        "left": offset.left + "px",
-        "width": (this.container.outerWidth(true) - 2) + "px",  # Subtract border because we are *not* in border-box mode
-        "maxHeight": "99999px",
-        "display": "block"
+        "left": offset.left + "px"
       }
 
       @search_results.css("maxHeight", "240px")
@@ -277,11 +280,19 @@ class Chosen extends AbstractChosen
       # maxHeight = 100 if maxHeight < 100
       # @dropdown.css("maxHeight", maxHeight + "px")
       # @search_results.css("maxHeight", ( maxHeight - @search_container.height() - 10 ) + "px")
+    else
+      @dropdown.css {
+        "left": "-9999px"
+      }
 
   update_results_content: (content) ->
     @search_results.html content
 
   results_hide: ->
+    # Note that we do not use display: none to hide the dropdown. This is because
+    # we rely on events triggered from the input box inside the dropdown. If the
+    # dropdown's display was set to none, the events will no longer fire. The
+    # control will also no longer participate in the TAB events properly.
     if @results_showing
       @search_results.scrollTop(0);
 
@@ -290,8 +301,7 @@ class Chosen extends AbstractChosen
       @container.removeClass "chosen-with-drop"
       @form_field_jq.trigger("chosen:hiding_dropdown", {chosen: this})
       @dropdown.css {
-        "left" : "-9000px",
-        "display" : "none"
+        "left": "-9999px"
       }
     @results_showing = false
 

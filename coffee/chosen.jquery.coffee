@@ -109,6 +109,7 @@ class Chosen extends AbstractChosen
     @search_field.bind 'keyup.chosen', (evt) => this.keyup_checker(evt); return
     @search_field.bind 'keydown.chosen', (evt) => this.keydown_checker(evt); return
     @search_field.bind 'focus.chosen', (evt) => this.input_focus(evt); return
+    @search_field.bind 'click.chosen', (evt) => evt.stopPropagation(); return
 
     if @is_multiple
       @search_choices.bind 'click.chosen', (evt) => this.choices_click(evt); return
@@ -181,8 +182,8 @@ class Chosen extends AbstractChosen
     @container.addClass "chosen-container-active"
     @active_field = true
 
-    @search_field.val(@search_field.val())
     @search_field.focus()
+    @search_field.val(@search_field.val())
 
 
   test_active_click: (evt) ->

@@ -13,7 +13,9 @@ class AbstractChosen
     this.register_observers()
 
   set_default_values: ->
-    @click_test_action = (evt) => this.test_active_click(evt)
+    @click_test_action = (evt) =>
+      this.test_active_click(evt)
+      true
     @activate_action = (evt) => this.activate_field(evt)
     @active_field = false
     @mouse_on_container = false

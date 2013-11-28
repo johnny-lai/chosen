@@ -84,6 +84,8 @@ class Chosen extends AbstractChosen
   register_observers: ->
     @container.bind 'mousedown.chosen', (evt) => this.container_mousedown(evt); return
     @container.bind 'mouseup.chosen', (evt) => this.container_mouseup(evt); return
+    @container.bind 'mouseenter.chosen', (evt) => this.mouse_enter(evt); return
+    @container.bind 'mouseleave.chosen', (evt) => this.mouse_leave(evt); return
     @dropdown.bind 'mouseenter.chosen', (evt) => this.mouse_enter(evt); return
     @dropdown.bind 'mouseleave.chosen', (evt) => this.mouse_leave(evt); return
 

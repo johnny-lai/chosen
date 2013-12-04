@@ -46,6 +46,7 @@ $chosen-edge-highlight-retina: image-url('chosen-edge-highlight@2x.png');
   
   .chosen-results {
     li.is-scope.highlighted {
+      background: #3875d7 $chosen-edge-highlight no-repeat 100% -26px;
       @include background($chosen-edge-highlight no-repeat 100% -26px, linear-gradient(#3875d7 20%, #2a62bc 90%));
     }
   }

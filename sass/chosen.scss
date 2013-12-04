@@ -7,6 +7,8 @@ $chosen-sprite: image-url('chosen-sprite.png');
 $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
 $chosen-edge: image-url('chosen-edge.png');
 $chosen-edge-retina: image-url('chosen-edge@2x.png');
+$chosen-edge-highlight: image-url('chosen-edge-highlight.png');
+$chosen-edge-highlight-retina: image-url('chosen-edge-highlight@2x.png');
 
 /* @group Base */
 .chosen-container {
@@ -44,7 +46,7 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
   
   .chosen-results {
     li.is-scope.highlighted {
-      @include background($chosen-edge no-repeat 100% -51px, linear-gradient(#3875d7 20%, #2a62bc 90%));
+      @include background($chosen-edge-highlight no-repeat 100% -26px, linear-gradient(#3875d7 20%, #2a62bc 90%));
     }
   }
   &.chosen-overflowing .chosen-search {
@@ -507,7 +509,7 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
   .chosen-rtl .chosen-search input[type="text"],
   .chosen-container-single .chosen-single abbr,
   .chosen-container-single .chosen-single div b,
-  .chosen-container-single .chosen-search input[type="text"],
+  .chosen-container-single .chosen-search .chosen-search-state,
   .chosen-container-multi .chosen-choices .search-choice .search-choice-close,
   .chosen-container .chosen-results-scroll-down span,
   .chosen-container .chosen-results-scroll-up span {
@@ -517,7 +519,20 @@ $chosen-edge-retina: image-url('chosen-edge@2x.png');
   }
   .chosen-container .chosen-overflow {
     background-image: $chosen-edge-retina !important;
-    background-size: 15px 76px !important;
+    background-size: 15px 50px !important;
   }
+  .chosen-drop, .chosen-container-single {
+    li.is-scope {
+      @include background($chosen-edge-retina no-repeat 100% -26px !important);
+      background-size: 15px 50px !important;
+    }
+  }
+  .chosen-drop .chosen-results {
+    li.is-scope.highlighted {
+      @include background($chosen-edge-highlight-retina no-repeat 100% -26px !important, linear-gradient(#3875d7 20%, #2a62bc 90%));
+      background-size: 15px 50px !important;
+    }
+  }
+
 }
 /* @end */

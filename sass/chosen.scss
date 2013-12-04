@@ -521,17 +521,15 @@ $chosen-edge-highlight-retina: image-url('chosen-edge-highlight@2x.png');
     background-image: $chosen-edge-retina !important;
     background-size: 15px 50px !important;
   }
-  .chosen-drop, .chosen-container-single {
-    li.is-scope {
-      @include background($chosen-edge-retina no-repeat 100% -26px !important);
-      background-size: 15px 50px !important;
-    }
+  .chosen-drop li.is-scope,
+  .chosen-container-single .chosen-single-with-scopes span .chosen-scopes li.is-scope {
+    @include background($chosen-edge-retina no-repeat 100% -26px);
+    background-size: 15px 50px;
   }
-  .chosen-drop .chosen-results {
-    li.is-scope.highlighted {
-      @include background($chosen-edge-highlight-retina no-repeat 100% -26px !important, linear-gradient(#3875d7 20%, #2a62bc 90%));
-      background-size: 15px 50px !important;
-    }
+  .chosen-drop .chosen-results li.is-scope.highlighted {
+    background: #3875d7 $chosen-edge-highlight-retina no-repeat 100% -26px;
+    @include background($chosen-edge-highlight-retina no-repeat 100% -26px, linear-gradient(#3875d7 20%, #2a62bc 90%));
+    background-size: 15px 50px;
   }
 
 }

@@ -91,8 +91,8 @@
           <td>false</td>
           <td>By default, Chosen's search matches starting at the beginning of a word. Setting this option to <code class="language-javascript">true</code> allows matches starting from anywhere within a word. This is especially useful for options that include a lot of special characters or phrases in ()'s and []'s.</td>
         </tr>
-        <tr class="extension">
-          <td>show_scope_of_selected_item</td>
+        <tr>
+          <td class="extension">show_scope_of_selected_item</td>
           <td>false</td>
           <td>When <code class="language-javascript">false</code>, Chosen will show the hierarchy of scopes in the search box.</td>
         </tr>
@@ -101,8 +101,8 @@
           <td>true</td>
           <td>By default, pressing delete/backspace on multiple selects will remove a selected choice. When <code class="language-javascript">false</code>, pressing delete/backspace will highlight the last choice, and a second press deselects it.</td>
         </tr>
-        <tr class="extension">
-          <td>source</td>
+        <tr>
+          <td class="extension">source</td>
           <td>null</td>
           <td>By default, Chosen will use the OPTION tags as the list of items. You can change this by providing a source. A source can be a string, an array or a function.</td>
         </tr>
@@ -136,6 +136,8 @@
     &lt;option value="1"&gt;Option 1&lt;/option&gt;
     &lt;option value="2" selected&gt;Option 2&lt;/option&gt;
     &lt;option value="3" disabled&gt;Option 3&lt;/option&gt;
+    &lt;option value="4" data='{"is_scope": true}'&gt;Scope 1&lt;/option&gt;
+    &lt;option value="5" data='{"in_scope": "4"}'&gt;Option 1 of Scope 1&lt;/option&gt;
   &lt;/select&gt;</code>
 </pre>
 
@@ -157,6 +159,10 @@
         <tr>
           <td>selected, disabled</td>
           <td>Chosen automatically highlights selected options and disables disabled options.</td>
+        </tr>
+        <tr>
+          <td class="extension">data</td>
+          <td>You can add a JSON-formatted attribute to provide additional information about the option. For example, you can use this to specify additional information about the scope/hierarchy of the option.</td>
         </tr>
       </table>
 

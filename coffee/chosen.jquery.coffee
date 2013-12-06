@@ -57,7 +57,7 @@ class Chosen extends AbstractChosen
     @containers = @container.add(@dropdown)
 
     if @overflow_container
-      $( @overflow_container ).live "scroll", (evt) => @update_position(evt)
+      $( @overflow_container ).scroll (evt) => @update_position(evt)
 
     @search_field = @container.find('input').first()
     @search_results = @container.find('ul.chosen-results').first()

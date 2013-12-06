@@ -19,14 +19,14 @@
     <div id="container">
       <div id="content">
         <header>
-          <h1>Chosen <small>(<span id="latest-version">v1.0.0</span>)</small></h1>
+          <h1>Chosen <small>(A derivative of <span id="latest-version">v1.0.0</span>)</small></h1>
         </header>
         <p>Chosen is a jQuery plugin that makes long, unwieldy select boxes much more user-friendly.</p>
 
         <p>
-          <a class="button button-blue" href="https://github.com/harvesthq/chosen/releases">Downloads</a>
-          <a class="button" href="https://github.com/harvesthq/chosen">Project Source</a>
-          <a class="button" href="https://github.com/harvesthq/chosen/blob/master/contributing.md">Contribute</a>
+          <a class="button button-blue" href="https://github.com/johnny-lai/chosen/releases">Downloads</a>
+          <a class="button" href="https://github.com/johnny-lai/chosen">Project Source</a>
+          <a class="button" href="https://github.com/harvesthq/chosen">Original Source</a>
         </p>
 
         <h2><a name="standard-select" class="anchor" href="#standard-select">Standard Select</a></h2>
@@ -547,7 +547,7 @@
         </div>
       </div>
       
-      <h2><a name="source" class="anchor" href="#source">Data Source</a></h2>
+      <h2><a name="source" class="anchor" href="#source">Data Source</a> <small>(Extension)</version></h2>
       <div class="side-by-side clearfix">
         <div>
          <em>Single select</em>
@@ -817,6 +817,11 @@
           </select>
         </div>
       </div>
+      <pre><code class="language-javascript">$(".chosen-select").chosen({
+  allow_single_deselect: true,
+  show_scope_of_selected_item: true
+});</code></pre>
+      
       <div class="side-by-side clearfix">
         <div>
          <em>Single select with an array data source</em>
@@ -831,6 +836,29 @@
           </select>
         </div>
       </div>
+      <pre><code class="language-javascript">$(".chosen-select").chosen({
+  allow_single_deselect: true,
+  show_scope_of_selected_item: true,
+  source: [{
+    value: 1,
+    label: "Hi",
+    in_scope: 3
+  }, {
+    value: 2,
+    label: "Mascot",
+    in_scope: 4
+  }, {
+    value: 3,
+    label: "Greetings",
+    in_scope: 4,
+    is_scope: true
+  }, {
+    value: 4,
+    label: "English",
+    is_scope: true
+  }]
+});</code></pre>
+      
       <div class="side-by-side clearfix">
         <div>
          <em>Single select with a function data source</em>
@@ -853,6 +881,42 @@
         </div>
       </div>
       <div class="side-by-side clearfix">
+        <pre><code class="language-javascript">$(".chosen-select").chosen({
+  allow_single_deselect: true,
+  show_scope_of_selected_item: true,
+  source: function(request, response) {
+    var data = [];
+    data.push({
+      value: 'group',
+      group: true,
+      label: "Sample"
+    });
+    for(var i = 0; i < 10; ++i) {
+      var name;
+      if(request.term) {
+        name = request.term;
+      } else {
+        name = request.scopes.join("-")
+      }
+      name = name + " (" + i + ")";
+      data.push({
+        group_array_index: 'group',
+        text: name,
+        value: name + "-" + i,
+        is_scope: request.term.match(/z/) !== null
+      });
+    }
+    data.push({
+      text: "And many more...",
+      always_show: true,
+      disabled: true
+    });
+    response(data);
+  }
+});</code></pre>
+      </div>
+
+      <div class="side-by-side clearfix">
         <div>
          <em>Single select with a URL data source</em>
           <select class="chosen-source-string" style="width:350px;" tabindex="9">
@@ -866,13 +930,63 @@
           </select>
         </div>
       </div>
+      <div class="side-by-side clearfix">
+        <pre><code class="language-javascript">$(".chosen-select").chosen({ source: "http://127.0.0.1:3000/sample" });</code></pre>
+      </div>
 
+      <h2>Overflow Support <small>(Extension based on <a href="https://github.com/gil/chosen">https://github.com/gil/chosen</a>)</small></h2>
+      <div class="side-by-side clearfix">
+        
+        <p>Support for areas with <code class="language-css">overflow:auto</code> by rendering Chosen dropdown on page body.</p>
+
+        <p>If the parent node is not an <code class="language-css">overflow:auto</code> div, you can still detect scroll events by doing:</p>
+        <pre><code class="language-javascript">$(".chosen-select").chosen({ overflow_container: $(".my-div") });</code></pre>
+
+        <p>Or disable scroll handling:</p>
+        <pre><code class="language-javascript">$(".chzn-select").chosen({ overflow_container: false });</code></pre>
+      </div>
+      <div class="side-by-side clearfix" style="overflow:auto; max-height: 200px; border: 1px solid #DADADA;">
+
+        This area has a scrollbar!<br/><br/>
+        And you can see that Chosen is still working even when you need to scroll this div.</br><br/>
+        Try it:<br/>
+
+        <select data-placeholder="Your Favorite Type of Bear" style="width:350px;" class="chosen-select" tabindex="11">
+          <option value=""></option>
+          <option>American Black Bear</option>
+          <option>Asiatic Black Bear</option>
+          <option>Brown Bear</option>
+          <option>Giant Panda</option>
+          <option selected>Sloth Bear</option>
+          <option>Sun Bear</option>
+          <option>Polar Bear</option>
+          <option>Spectacled Bear</option>
+        </select>
+
+        <br/></br><br/>
+        And if you keep scrolling...<br/><br/>
+        and scrolling...</br><br/>
+        You'll find another combo. And it's working too!<br/><br/>
+
+        <select data-placeholder="Your Favorite Type of Bear" style="width:350px;" class="chosen-select-deselect" tabindex="12">
+          <option value=""></option>
+          <option>American Black Bear</option>
+          <option>Asiatic Black Bear</option>
+          <option>Brown Bear</option>
+          <option>Giant Panda</option>
+          <option selected>Sloth Bear</option>
+          <option>Sun Bear</option>
+          <option>Polar Bear</option>
+          <option>Spectacled Bear</option>
+        </select>
+
+      </div>
 
       <h2><a name="multiple-select" class="anchor" href="#multiple-select">Multiple Select</a></h2>
       <div class="side-by-side clearfix">
         <div>
           <em>Turns This</em>
-          <select data-placeholder="Choose a Country..." style="width:350px;" multiple tabindex="11"">
+          <select data-placeholder="Choose a Country..." style="width:350px;" multiple tabindex="13">
             <option value=""></option>
             <option value="United States">United States</option>
             <option value="United Kingdom">United Kingdom</option>
@@ -1129,7 +1243,7 @@
         </div>
         <div>
           <em>Into This</em>
-          <select data-placeholder="Choose a Country..." class="chosen-select" multiple style="width:350px;" tabindex="12">
+          <select data-placeholder="Choose a Country..." class="chosen-select" multiple style="width:350px;" tabindex="14">
             <option value=""></option>
             <option value="United States">United States</option>
             <option value="United Kingdom">United Kingdom</option>
@@ -1390,7 +1504,7 @@
       <div class="side-by-side clearfix">
         <div>
           <em>Single Select with Groups</em>
-          <select data-placeholder="Your Favorite Football Team" style="width:350px;" class="chosen-select" tabindex="13">
+          <select data-placeholder="Your Favorite Football Team" style="width:350px;" class="chosen-select" tabindex="15">
             <option value=""></option>
             <optgroup label="NFC EAST">
               <option>Dallas Cowboys</option>
@@ -1444,7 +1558,7 @@
         </div>
         <div>
           <em>Multiple Select with Groups</em>
-          <select data-placeholder="Your Favorite Football Team" style="width:350px;" class="chosen-select" multiple tabindex="14">
+          <select data-placeholder="Your Favorite Football Team" style="width:350px;" class="chosen-select" multiple tabindex="16">
             <option value=""></option>
             <optgroup label="NFC EAST">
               <option>Dallas Cowboys</option>
@@ -1503,7 +1617,7 @@
         <p>Chosen automatically highlights selected options and removes disabled options.</p>
         <div>
           <em>Single Select</em>
-          <select data-placeholder="Your Favorite Type of Bear" style="width:350px;" class="chosen-select" tabindex="15">
+          <select data-placeholder="Your Favorite Type of Bear" style="width:350px;" class="chosen-select" tabindex="17">
             <option value=""></option>
             <option>American Black Bear</option>
             <option>Asiatic Black Bear</option>
@@ -1517,7 +1631,7 @@
         </div>
         <div>
           <em>Multiple Select</em>
-          <select data-placeholder="Your Favorite Types of Bear" style="width:350px;" multiple class="chosen-select" tabindex="16">
+          <select data-placeholder="Your Favorite Types of Bear" style="width:350px;" multiple class="chosen-select" tabindex="18">
             <option value=""></option>
             <option>American Black Bear</option>
             <option>Asiatic Black Bear</option>
@@ -1537,7 +1651,7 @@
         <pre><code class="language-javascript">$(".chosen-select").chosen({disable_search_threshold: 10});</code></pre>
         <p></p>
         <div>
-          <select data-placeholder="Your Favorite Type of Bear" style="width:350px;" class="chosen-select-no-single" tabindex="17">
+          <select data-placeholder="Your Favorite Type of Bear" style="width:350px;" class="chosen-select-no-single" tabindex="19">
             <option value=""></option>
             <option>American Black Bear</option>
             <option>Asiatic Black Bear</option>
@@ -1566,7 +1680,7 @@
         <p></p>
         <div>
           <em>Single Select</em>
-          <select data-placeholder="Type 'C' to view" style="width:350px;" class="chosen-select-no-results" tabindex="18">
+          <select data-placeholder="Type 'C' to view" style="width:350px;" class="chosen-select-no-results" tabindex="20">
             <option value=""></option>
             <option>American Black Bear</option>
             <option>Asiatic Black Bear</option>
@@ -1580,7 +1694,7 @@
         </div>
         <div>
           <em>Multiple Select</em>
-          <select data-placeholder="Type 'C' to view" style="width:350px;" multiple class="chosen-select-no-results" tabindex="19">
+          <select data-placeholder="Type 'C' to view" style="width:350px;" multiple class="chosen-select-no-results" tabindex="21">
             <option value=""></option>
             <option>American Black Bear</option>
             <option>Asiatic Black Bear</option>
@@ -1606,7 +1720,7 @@
       <div class="side-by-side clearfix">
         <p>When a single select box isn't a required field, you can set <code class="language-javascript">allow_single_deselect: true</code> and Chosen will add a UI element for option deselection. This will only work if the first option has blank text.</p>
         <div class="side-by-side clearfix">
-          <select data-placeholder="Your Favorite Type of Bear" style="width:350px;" class="chosen-select-deselect" tabindex="20">
+          <select data-placeholder="Your Favorite Type of Bear" style="width:350px;" class="chosen-select-deselect" tabindex="22">
             <option value=""></option>
             <option>American Black Bear</option>
             <option>Asiatic Black Bear</option>
@@ -1626,7 +1740,7 @@
         <pre><code class="language-markup">&lt;select class="chosen-select <strong>chosen-rtl</strong>"&gt;</code></pre>
         <div>
           <em>Single right to left select</em>
-          <select data-placeholder="Your Favorite Type of Bear" style="width:350px;" class="chosen-select chosen-rtl" tabindex="21">
+          <select data-placeholder="Your Favorite Type of Bear" style="width:350px;" class="chosen-select chosen-rtl" tabindex="23">
             <option value=""></option>
             <option>American Black Bear</option>
             <option>Asiatic Black Bear</option>
@@ -1638,7 +1752,7 @@
         </div>
         <div>
           <em>Multiple right to left select</em>
-          <select data-placeholder="Your Favorite Types of Bear" style="width:350px;" multiple class="chosen-select  chosen-rtl" tabindex="22">
+          <select data-placeholder="Your Favorite Types of Bear" style="width:350px;" multiple class="chosen-select  chosen-rtl" tabindex="24">
             <option value=""></option>
             <option>American Black Bear</option>
             <option>Asiatic Black Bear</option>
@@ -1672,7 +1786,7 @@
         <pre><code class="language-javascript"> $(".chosen-select").chosen({width: "95%"}); </code></pre>
         <div>
           <em>Single Select</em>
-          <select data-placeholder="Your Favorite Types of Bear" class="chosen-select-width" tabindex="23">
+          <select data-placeholder="Your Favorite Types of Bear" class="chosen-select-width" tabindex="25">
             <option value=""></option>
             <option selected>American Black Bear</option>
             <option>Asiatic Black Bear</option>
@@ -1686,7 +1800,7 @@
         </div>
         <div>
           <em>Multiple Select</em>
-          <select data-placeholder="Your Favorite Types of Bear" multiple class="chosen-select-width" tabindex="24">
+          <select data-placeholder="Your Favorite Types of Bear" multiple class="chosen-select-width" tabindex="26">
             <option value=""></option>
             <option>American Black Bear</option>
             <option>Asiatic Black Bear</option>
@@ -1706,7 +1820,7 @@
         <p></p>
         <div>
           <em><label for="single-label-example">Click to Highlight Single Select</label></em>
-          <select data-placeholder="Your Favorite Types of Bear" class="chosen-select" style="width:350px;" tabindex="25" id="single-label-example">
+          <select data-placeholder="Your Favorite Types of Bear" class="chosen-select" style="width:350px;" tabindex="27" id="single-label-example">
             <option value=""></option>
             <option selected>American Black Bear</option>
             <option>Asiatic Black Bear</option>
@@ -1720,7 +1834,7 @@
         </div>
         <div>
           <em><label for="multiple-label-example">Click to Highlight Multiple Select</label></em>
-          <select data-placeholder="Your Favorite Types of Bear" multiple class="chosen-select" style="width:350px;" tabindex="26" id="multiple-label-example">
+          <select data-placeholder="Your Favorite Types of Bear" multiple class="chosen-select" style="width:350px;" tabindex="28" id="multiple-label-example">
             <option value=""></option>
             <option>American Black Bear</option>
             <option>Asiatic Black Bear</option>
@@ -1737,7 +1851,7 @@
       <h2><a name="setup" class="anchor" href="#setup">Setup</a></h2>
       <p>Using Chosen is easy as can be.</p>
       <ol>
-        <li><a href="https://github.com/harvesthq/chosen/releases">Download</a> the plugin and copy the chosen files to your app.</li>
+        <li><a href="https://github.com/johnny-lai/chosen/releases">Download</a> the plugin and copy the chosen files to your app.</li>
         <li>Activate the plugin on the select boxes of your choice: <code class="language-javascript">$(".chosen-select").chosen()</code></li>
         <li><a href="http://www.youtube.com/watch?feature=player_detailpage&v=UkSPUDpe0U8#t=11s">Disco</a>.</li>
       </ol>
@@ -1750,15 +1864,15 @@
         </li>
        <li>
           <h3>Something doesn't work. Can you fix it?</h3>
-          <p>Yes! Please report all issues using the <a href="http://github.com/harvesthq/chosen/issues">GitHub issue tracking tool</a>. Please include the plugin version (jQuery or Prototype), browser and OS. The more information provided, the easier it is to fix a problem.</p>
+          <p>Yes! Please report all issues using the <a href="http://github.com/johnny-lai/chosen/issues">GitHub issue tracking tool</a>. Please include the plugin version (jQuery or Prototype), browser and OS. The more information provided, the easier it is to fix a problem.</p>
        </li>
        <li>
           <h3>What browsers are supported?</h3>
-          <p>All modern browsers are supported (Firefox, Chrome, Safari and IE9). Legacy support for IE8 is also enabled.</p>
+          <p>All modern browsers are supported (Firefox, Chrome, Safari and IE9). This derivative version should also work on IE7 and IE8.</p>
        </li>
        <li>
           <h3>Didn't there used to be a Prototype version of Chosen?</h3>
-          <p><a href="index.proto.html">There still is!</a></p>
+          <p>This derivative did not update the prototype version, so it is probably broken.</p>
         </li>
       </ul>
 
@@ -1776,6 +1890,13 @@
       </footer>
 
     </div>
+  </div>
+  </form>
+  <div class="oss-bar">
+    <ul>
+      <li><a class="fork" href="https://github.com/johnny-lai/chosen">Fork on Github</a></li>
+      <li><a class="harvest" href="http://www.getharvest.com/">Built by Harvest</a></li>
+    </ul>
   </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript"></script>
 <!--[if IE 7 ]>
@@ -1874,12 +1995,5 @@
     });
   </script>
 <![endif]-->
-  </form>
-  <div class="oss-bar">
-    <ul>
-      <li><a class="fork" href="https://github.com/harvesthq/chosen">Fork on Github</a></li>
-      <li><a class="harvest" href="http://www.getharvest.com/">Built by Harvest</a></li>
-    </ul>
-  </div>
 </body>
 </html>

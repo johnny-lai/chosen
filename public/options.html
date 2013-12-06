@@ -72,6 +72,11 @@
            No reults match "Bad Search").</td>
         </tr>
         <tr>
+          <td>overflow_container</td>
+          <td>Chosen's DOM's parent</td>
+          <td>The element containing the Chosen. This is used to update the position of the dropdown when the container is scrolled.</td>
+        </tr>
+        <tr>
           <td>placeholder_text_multiple</td>
           <td>"Select Some Options"</td>
           <td>The text to be displayed as a placeholder when no options are selected for a multiple select.</td>
@@ -86,10 +91,20 @@
           <td>false</td>
           <td>By default, Chosen's search matches starting at the beginning of a word. Setting this option to <code class="language-javascript">true</code> allows matches starting from anywhere within a word. This is especially useful for options that include a lot of special characters or phrases in ()'s and []'s.</td>
         </tr>
+        <tr class="extension">
+          <td>show_scope_of_selected_item</td>
+          <td>false</td>
+          <td>When <code class="language-javascript">false</code>, Chosen will show the hierarchy of scopes in the search box.</td>
+        </tr>
         <tr>
           <td>single_backstroke_delete</td>
           <td>true</td>
           <td>By default, pressing delete/backspace on multiple selects will remove a selected choice. When <code class="language-javascript">false</code>, pressing delete/backspace will highlight the last choice, and a second press deselects it.</td>
+        </tr>
+        <tr class="extension">
+          <td>source</td>
+          <td>null</td>
+          <td>By default, Chosen will use the OPTION tags as the list of items. You can change this by providing a source. A source can be a string, an array or a function.</td>
         </tr>
         <tr>
           <td>width</td>

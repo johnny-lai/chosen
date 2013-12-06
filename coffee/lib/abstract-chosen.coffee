@@ -2,6 +2,7 @@ class AbstractChosen
 
   constructor: (@form_field, @options={}) ->
     return unless AbstractChosen.browser_is_supported()
+    @search_count = 0
     @scopes = []
     @is_multiple = @form_field.multiple
     this.set_default_text()
@@ -255,10 +256,15 @@ class AbstractChosen
     scopes: @scopes
   
   search: (cb) ->
+    # TODO: Consider notifying data sources when their search requests are no
+    # longer necessary
     that = this
+    this_request = ++@search_count
     @source.search this, (data) ->
-      that.results_data = data
-      cb.call(that) if cb?
+      # Ignore callbacks with data that are not the last search request
+      if that.search_count == this_request
+        that.results_data = data
+        cb.call(that) if cb?
   
   search_results_touchstart: (evt) ->
     @touch_started = true

@@ -82,6 +82,7 @@ class Chosen extends AbstractChosen
     $("body").append( @dropdown )
 
   register_observers: ->
+    @form_field_jq.bind 'remove', (evt) => this.destroy()
     @container.bind 'mousedown.chosen', (evt) => this.container_mousedown(evt); return
     @container.bind 'mouseup.chosen', (evt) => this.container_mouseup(evt); return
     @container.bind 'mouseenter.chosen', (evt) => this.mouse_enter(evt); return
@@ -124,6 +125,7 @@ class Chosen extends AbstractChosen
       @form_field_jq[0].tabIndex = @search_field[0].tabIndex
 
     @container.remove()
+    @dropdown.remove()
     @form_field_jq.removeData('chosen')
     @form_field_jq.show()
 

@@ -616,10 +616,21 @@ class Chosen extends AbstractChosen
       w = div.width() + 25
       div.remove()
 
-      f_width = @container.outerWidth()
+      if @search_scroller
+        max_width = @search_scroller.innerWidth()
 
-      if( w > f_width - 10 )
-        w = f_width - 10
+        tw = 0
+        @search_field.parent().siblings().each () ->
+          tw += $(this).outerWidth(true);
+
+        left_width = max_width - tw
+      else
+        max_width = @container.outerWidth() - 10
+
+      if(left_width && w < left_width)
+        w = left_width
+      else if(w > max_width)
+        w = max_width
 
       @search_field.css({'width': w + 'px'})
       @update_position()

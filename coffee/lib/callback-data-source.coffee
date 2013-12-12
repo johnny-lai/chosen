@@ -13,11 +13,10 @@ class CallbackDataSource extends DataSource
       key = JSON.stringify(chosen.get_search_request())
       data = @cache[key]
       if not data?
-        ds = this
         chosen.loading(true)
-        this.perform_search chosen, (data) ->
+        @perform_search chosen, (data) =>
           chosen.loading(false)
-          ds.cache[key] = data
+          @cache[key] = data
           response_cb (data)
       else
         response_cb(data)
@@ -25,9 +24,8 @@ class CallbackDataSource extends DataSource
       this.did_search(chosen, response_cb, this.items_as_array())
   
   perform_search: (chosen, response_cb) ->
-    ds = this
-    @source.call chosen, chosen.get_search_request(), (data) ->
-      ds.did_search(chosen, response_cb, data)
+    @source.call chosen, chosen.get_search_request(), (data) =>
+      @did_search(chosen, response_cb, data)
   
   did_search: (chosen, response_cb, data) ->
     # Merge with new results

@@ -29,18 +29,45 @@ class DataSource
   get_item_by_value: (value) ->
     @select_parser.get_item_by_value(value)
 
+  get_group: (option) ->
+    if option.group_array_index?
+      @get_item(option.group_array_index)
+    else if option.group_array_value?
+      @get_item_by_value(option.group_array_value)
+    else
+      null
+
+  get_groups: () ->
+    item for item in @select_parser.select_to_array() when item.group
+
   search: (chosen, response_cb) ->
     filter_scope = if not chosen.results_data?
-      # First time search, we use the selected item as the scopes
+      # Run through list to mark which scopes each group is in
+      # The aim is to place the groups in the same position
+      for item in this.items_as_array()
+        # Fix normalize missing in_scope as null
+        item.in_scope = null unless item.in_scope?
+
+        # Mark in_scopes for group
+        item_group = @get_group(item)
+        if item_group
+          item_group.in_scopes ||= {}
+          item_group.in_scopes[item.in_scope] = true
+
+        # Mark in_scopes for item
+        item.in_scopes ||= {}
+        item.in_scopes[item.in_scope] = true
+
+        # First time search, we use the selected item as the scopes
+        scope = item.in_scope if item.selected
+
+      # Generated parsed by scopes list
       @parsed_by_scopes = {}
       for item in this.items_as_array()
-        in_scope = item.in_scope
-        if not in_scope?
-          in_scope = null
-        if item.selected
-          scope = item.in_scope
-        @parsed_by_scopes[in_scope] ||= []
-        @parsed_by_scopes[in_scope].push(item)
+        for scope, v of item.in_scopes
+          @parsed_by_scopes[scope] ||= []
+          @parsed_by_scopes[scope].push(item)
+
       scope
     else
       scopes = chosen.get_search_request().scopes

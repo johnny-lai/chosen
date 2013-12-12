@@ -87,7 +87,7 @@ class AbstractChosen
     classes.push "active-result" if !option.disabled and !(option.selected and @is_multiple)
     classes.push "disabled-result" if option.disabled and !(option.selected and @is_multiple)
     classes.push "result-selected" if option.selected
-    classes.push "group-option" if option.group_array_index? and @source.get_item(option.group_array_index)?
+    classes.push "group-option" if @source.get_group(option)?
     classes.push "is-scope" if option.is_scope
     classes.push option.classes if option.classes != ""
 
@@ -155,8 +155,8 @@ class AbstractChosen
             option.group_match = false
             option.active_options = 0
 
-          if option.group_array_index? and @source.get_item(option.group_array_index)
-            results_group = @source.get_item(option.group_array_index)
+          results_group = @source.get_group(option)
+          if results_group
             results += 1 if results_group.active_options is 0 and results_group.search_match
             results_group.active_options += 1
                   
@@ -176,7 +176,7 @@ class AbstractChosen
 
               results_group.group_match = true if results_group?
             
-            else if option.group_array_index? and @source.get_item(option.group_array_index).search_match
+            else if results_group and results_group.search_match
               option.search_match = true
 
       this.result_clear_highlight()

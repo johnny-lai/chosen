@@ -64,9 +64,9 @@ class DataSource
       # Generated parsed by scopes list
       @parsed_by_scopes = {}
       for item in this.items_as_array()
-        for scope, v of item.in_scopes
-          @parsed_by_scopes[scope] ||= []
-          @parsed_by_scopes[scope].push(item)
+        for s, v of item.in_scopes
+          @parsed_by_scopes[s] ||= []
+          @parsed_by_scopes[s].push(item)
 
       scope
     else

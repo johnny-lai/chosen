@@ -459,7 +459,7 @@ class Chosen extends AbstractChosen
 
     if @options.show_scope_of_selected_item
       html = '<ul class="chosen-scopes">'
-      html += '<li class="is-scope">' + @source.get_item_by_value(v).html + '</li>' for v in @scopes
+      html += '<li class="is-scope">' + v.html + '</li>' for v in @scopes_of_selection
       html += '<li>' + text + '</li>'
       html += '</ul>'
       @selected_item.find("span").html(html)
@@ -485,12 +485,21 @@ class Chosen extends AbstractChosen
   result_scopes_build: ->
     this.result_clear_scope()
     if not @is_multiple
-      h = []
+      # @scopes_of_selection: This is the scopes of the current selection.
+      # @scopes: This is the current search scope
+      # Note that the scopes of the current selection may contain parents that are no
+      # longer scopes. This is not true for the current search scope.
+      @scopes_of_selection = []
       v = @source.get_item_by_value(@form_field_jq.val())
       while v? and v.in_scope? and (v = @source.get_item_by_value(v.in_scope))?
-        h.push(v)
-      this.scope_build v for v in h by -1
-    
+        @scopes_of_selection.push(v)
+      @scopes_of_selection.reverse()
+
+      # Set the current search scope up to the first non-scope
+      for v in @scopes_of_selection
+        break if !v.is_scope
+        this.scope_build v
+
   result_deselect: (array_index) ->
     option = @source.get_option_element(array_index)
 

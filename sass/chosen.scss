@@ -5,10 +5,6 @@
 
 $chosen-sprite: image-url('chosen-sprite.png');
 $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
-$chosen-edge: image-url('chosen-edge.png');
-$chosen-edge-retina: image-url('chosen-edge@2x.png');
-$chosen-edge-highlight: image-url('chosen-edge-highlight.png');
-$chosen-edge-highlight-retina: image-url('chosen-edge-highlight@2x.png');
 
 /* @group Base */
 .chosen-container {
@@ -38,18 +34,7 @@ $chosen-edge-highlight-retina: image-url('chosen-edge-highlight@2x.png');
   border-top: 0;
   background: #fff;
   box-shadow: 0 4px 5px rgba(#000,.15);
-  
-  li.is-scope {
-    padding-right: 20px !important;
-    @include background($chosen-edge no-repeat 100% -26px);
-  }
-  
-  .chosen-results {
-    li.is-scope.highlighted {
-      background: #3875d7 $chosen-edge-highlight no-repeat 100% -26px;
-      @include background($chosen-edge-highlight no-repeat 100% -26px, linear-gradient(#3875d7 20%, #2a62bc 90%));
-    }
-  }
+
   &.chosen-overflowing .chosen-search {
     .chosen-overflow {
       display: block;
@@ -123,10 +108,6 @@ $chosen-edge-highlight-retina: image-url('chosen-edge-highlight@2x.png');
         li {
           margin: 0;
         }
-        li.is-scope {
-          padding-right: 17px !important;
-          @include background($chosen-edge no-repeat 100% -27px);
-        }
       }
     }
   }
@@ -159,7 +140,7 @@ $chosen-edge-highlight-retina: image-url('chosen-edge-highlight@2x.png');
       top: 0;
       bottom: 0;
       width: 6px;
-      @include background($chosen-edge no-repeat 0 0);
+      @include background($chosen-sprite no-repeat -37px -42px);
       display: none;
     }
 
@@ -181,49 +162,47 @@ $chosen-edge-highlight-retina: image-url('chosen-edge-highlight@2x.png');
     margin: 0 20px 0 0;
     padding: 0;
     cursor: text;
-  }
-  .chosen-scopes {
     height: 25px;
-    & li {
-      display: inline-block;
-      list-style: none;
-      &.search-field {
-        position: relative;
-        top: 0;
-        margin: 0;
-        padding: 0;
-        white-space: nowrap;
-        input[type="text"] {
-          @include box-sizing(border-box);
-          margin: 1px 0;
-          padding: 2px 4px 4px;
-          outline: 0;
-          border: 0 !important;
-          background: transparent !important;
-          box-shadow: none;
-          color: #666;
-          font-size: 100%;
-          font-family: sans-serif;
-          line-height: normal;
-          border-radius: 0;
-        }
-        .default {
-          color: #999;
-        }
-      }
-      &.search-choice {
-        position: relative;
-        margin: 0;
-        padding: 5px 0 5px 5px;
-        background-color: #e4e4e4;
-        color: #333;
+  }
+  li {
+    display: inline-block;
+    list-style: none;
+    &.search-field {
+      position: relative;
+      top: 0;
+      margin: 0;
+      padding: 0;
+      white-space: nowrap;
+      input[type="text"] {
+        @include box-sizing(border-box);
+        margin: 1px 0;
+        padding: 2px 4px 4px;
+        outline: 0;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none;
+        color: #666;
         font-size: 100%;
         font-family: sans-serif;
         line-height: normal;
+        border-radius: 0;
+      }
+      .default {
+        color: #999;
+      }
+    }
+    &.search-choice {
+      position: relative;
+      margin: 0;
+      padding: 5px 0 5px 5px;
+      background-color: #e4e4e4;
+      color: #333;
+      font-size: 100%;
+      font-family: sans-serif;
+      line-height: normal;
 
-        .search-choice-close {
-          display: none;
-        }
+      .search-choice-close {
+        display: none;
       }
     }
   }
@@ -505,6 +484,56 @@ $chosen-edge-highlight-retina: image-url('chosen-edge-highlight@2x.png');
 
 /* @end */
 
+/* @group Scopes */
+.chosen-drop, .chosen-container-single {
+  li.is-scope {
+    position: relative;
+    padding-right: 18px;
+    
+    div {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: block;
+      width: 18px;
+      height: 100%;
+      i {
+        display: block;
+        position: absolute;
+        width: 100%;
+        height: 11px;
+        background: $chosen-sprite no-repeat -42px -42px;
+      }
+    }
+  }
+
+  li.is-scope.highlighted {
+    background: #3875d7;
+    @include background(linear-gradient(#3875d7 20%, #2a62bc 90%));
+
+    div i {
+      background: $chosen-sprite no-repeat -42px -54px;
+    }
+  }
+}
+
+.chosen-drop {
+  li.is-scope div i {
+    margin-top: -5px;
+    top: 50%;
+  }
+}
+
+/* For the current selection */
+.chosen-container.chosen-container-single {
+  .chosen-scopes {
+    li.is-scope div i {
+      bottom: 7px;
+    }
+  }
+}
+/* @end */
+
 /* @group Retina compatibility */
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-resolution: 144dpi)  {
   .chosen-rtl .chosen-search input[type="text"],
@@ -513,25 +542,13 @@ $chosen-edge-highlight-retina: image-url('chosen-edge-highlight@2x.png');
   .chosen-container-single .chosen-search .chosen-search-state,
   .chosen-container-multi .chosen-choices .search-choice .search-choice-close,
   .chosen-container .chosen-results-scroll-down span,
-  .chosen-container .chosen-results-scroll-up span {
+  .chosen-container .chosen-results-scroll-up span,
+  .chosen-container .chosen-overflow,
+  .chosen-drop li.is-scope div i,
+  .chosen-container-single li.is-scope div i {
     background-image: $chosen-sprite-retina !important;
-    background-size: 58px 37px !important;
+    background-size: 58px 67px !important;
     background-repeat: no-repeat !important;
   }
-  .chosen-container .chosen-overflow {
-    background-image: $chosen-edge-retina !important;
-    background-size: 15px 50px !important;
-  }
-  .chosen-drop li.is-scope,
-  .chosen-container-single .chosen-single-with-scopes span .chosen-scopes li.is-scope {
-    @include background($chosen-edge-retina no-repeat 100% -26px);
-    background-size: 15px 50px;
-  }
-  .chosen-drop .chosen-results li.is-scope.highlighted {
-    background: #3875d7 $chosen-edge-highlight-retina no-repeat 100% -26px;
-    @include background($chosen-edge-highlight-retina no-repeat 100% -26px, linear-gradient(#3875d7 20%, #2a62bc 90%));
-    background-size: 15px 50px;
-  }
-
 }
 /* @end */

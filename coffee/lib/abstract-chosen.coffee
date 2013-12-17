@@ -95,7 +95,10 @@ class AbstractChosen
     option_el.className = classes.join(" ")
     option_el.style.cssText = option.style
     option_el.setAttribute("data-option-array-index", option.array_index)
-    option_el.innerHTML = option.search_text
+    option_el.innerHTML = if option.is_scope
+      option.search_text + '<div><i /></div>'
+    else
+      option.search_text
 
     this.outerHTML(option_el)
 

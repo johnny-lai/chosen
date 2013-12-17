@@ -355,14 +355,17 @@ class Chosen extends AbstractChosen
   choice_build: (item) ->
     choice = $('<li />', { class: "search-choice" }).html("<span>#{item.html}</span>")
 
-    choice.addClass 'is-scope' if item.is_scope
-    
     if item.disabled
       choice.addClass 'search-choice-disabled'
     else
       close_link = $('<a />', { class: 'search-choice-close', 'data-option-array-index': item.array_index })
       close_link.bind 'click.chosen', (evt) => this.choice_destroy_link_click(evt)
       choice.append close_link
+
+    if item.is_scope
+      choice.addClass 'is-scope'
+      choice_arrow = $('<div><i /></div>')
+      choice.append(choice_arrow)
 
     @search_container.before choice
 
@@ -459,7 +462,10 @@ class Chosen extends AbstractChosen
 
     if @options.show_scope_of_selected_item
       html = '<ul class="chosen-scopes">'
-      html += '<li class="is-scope">' + v.html + '</li>' for v in @scopes_of_selection
+      for v in @scopes_of_selection
+        html += '<li class="is-scope">'
+        html += v.html  + '<div><i></i></div>'
+        html += '</li>'
       html += '<li>' + text + '</li>'
       html += '</ul>'
       @selected_item.find("span").html(html)

@@ -179,6 +179,8 @@ class Chosen extends AbstractChosen
     @container.removeClass "chosen-container-active"
     this.clear_backstroke()
 
+    this.result_scopes_build()
+    
     this.show_search_field_default()
     this.search_field_scale()
 

@@ -57,7 +57,7 @@ class Chosen extends AbstractChosen
     @containers = @container.add(@dropdown)
 
     if @overflow_container
-      $( @overflow_container ).scroll (evt) => @update_position(evt)
+      $(@overflow_container).scroll (evt) => @update_position(evt)
 
     @search_field = @container.find('input').first()
     @search_results = @container.find('ul.chosen-results').first()
@@ -144,7 +144,7 @@ class Chosen extends AbstractChosen
   container_mousedown: (evt) ->
     if !@is_disabled
       if evt and evt.type is "mousedown" and not @results_showing
-        evt.preventDefault()
+        evt.stopPropagation()
 
       if not (evt? and ($ evt.target).hasClass "search-choice-close")
         if not @active_field

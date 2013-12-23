@@ -617,47 +617,57 @@ class Chosen extends AbstractChosen
 
   search_field_scale: ->
     if true #@is_multiple
-      h = 0
-      w = 0
+      # Check if we need to re-calculate
+      search_field_val = @search_field.val()
+      w = if @last_seach_field_val != search_field_val
+        # Calculate required width of the input box
+        style_block = "position:absolute; left: -1000px; top: -1000px; display:none;"
+        styles = ['font-size','font-style', 'font-weight', 'font-family','line-height', 'text-transform', 'letter-spacing']
 
-      style_block = "position:absolute; left: -1000px; top: -1000px; display:none;"
-      styles = ['font-size','font-style', 'font-weight', 'font-family','line-height', 'text-transform', 'letter-spacing']
+        for style in styles
+          style_block += style + ":" + @search_field.css(style) + ";"
 
-      for style in styles
-        style_block += style + ":" + @search_field.css(style) + ";"
+        div = $('<div />', { 'style' : style_block })
+        div.text search_field_val
+        $('body').append div
 
-      div = $('<div />', { 'style' : style_block })
-      div.text @search_field.val()
-      $('body').append div
+        w = div.width() + 25
+        div.remove()
 
-      w = div.width() + 25
-      div.remove()
+        @last_seach_field_width = w
+        @last_seach_field_val = search_field_val
+      w = @last_seach_field_width
 
+      # Calculate width of the search input box
       if @search_scroller
-        max_width = @search_scroller.innerWidth()
-
+        # tw is width of all scopes
         tw = 0
         @search_field.parent().siblings().each () ->
           tw += $(this).outerWidth(true);
 
-        left_width = max_width - tw
+        # Calculate min/max
+        inner_width = @search_scroller.innerWidth()
+        min_width = inner_width - tw
+        max_width = inner_width
+
+        w = min_width if(min_width && w < min_width)
+        w = max_width if(max_width && w > max_width)
+
+        # Scroll to the right
+        left = tw + w - inner_width
+        @search_scroller.scrollLeft(left)
+
+        # Use non-truncated input both width for overflow calculation
+        overflowing = tw + @last_seach_field_width > inner_width
+        this.overflowing(overflowing)
       else
+        # Multiple select does not have search scope scrolling
         max_width = @container.outerWidth() - 10
+        w = max_width if(w > max_width)
 
-      if(left_width && w < left_width)
-        w = left_width
-      else if(w > max_width)
-        w = max_width
-
-      @search_field.css({'width': w + 'px'})
+      # We subtract the padding. box-sizing model was not used because of IE7 support
+      @search_field.width(w - 8)
       @update_position()
-
-      if @search_scroller and @search_scroller.is(":visible")
-        cw = @search_scroller[0].scrollWidth
-
-        @search_scroller.scrollLeft(cw - w)
-
-        this.overflowing(cw > @search_scroller.width())
 
   loading: (loading) ->
     return @is_loading if not loading? or @is_loading == loading

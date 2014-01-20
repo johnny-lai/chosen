@@ -173,9 +173,10 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
       margin: 0;
       padding: 0;
       white-space: nowrap;
+      vertical-align: top;
       input[type="text"] {
         margin: 1px 0;
-        padding: 2px 4px 4px;
+        padding: 4px 4px 4px;
         outline: 0;
         border: 0 !important;
         background: transparent !important;
@@ -185,6 +186,7 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
         font-family: sans-serif;
         line-height: normal;
         border-radius: 0;
+        height: auto;
       }
       .default {
         color: #999;
@@ -291,6 +293,7 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
         margin: 0;
         padding: 0;
         white-space: nowrap;
+        vertical-align: top;
         input[type="text"] {
           margin: 1px 0;
           padding: 5px;
@@ -304,6 +307,7 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
           font-family: sans-serif;
           line-height: normal;
           border-radius: 0;
+          height: auto;
         }
         .default {
           color: #999;

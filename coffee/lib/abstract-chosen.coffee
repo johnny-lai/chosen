@@ -70,12 +70,13 @@ class AbstractChosen
       else
         content += this.result_add_option data
 
-      # this select logic pins on an awkward flag
-      # we can make it better
-      if options?.first
-        if data.selected and @is_multiple
+    # this select logic pins on an awkward flag
+    # we can make it better
+    if options?.first
+      for data in this.get_selected_items()
+        if @is_multiple
           this.choice_build data
-        else if data.selected and not @is_multiple
+        else
           this.single_set_selected_text(data.text)
 
     content

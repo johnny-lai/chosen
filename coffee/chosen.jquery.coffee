@@ -537,6 +537,19 @@ class Chosen extends AbstractChosen
   get_search_text: ->
     if @search_field.val() is @default_text then "" else $('<div/>').text($.trim(@search_field.val())).html()
 
+  get_selected_items: ->
+    val = @form_field_jq.val()
+    if not @is_multiple
+      val = if val == ''
+        []
+      else
+        [ val ]
+
+    if val?
+      (@source.get_item_by_value(v) for v in val)
+    else
+      []
+
   winnow_results_set_highlight: ->
 
     selected_results = if not @is_multiple then @search_results.find(".result-selected.active-result") else []

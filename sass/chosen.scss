@@ -95,6 +95,7 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
     overflow: auto;
     height: auto;
     white-space: normal;
+    background-color: #fff;
     @include background(linear-gradient(top, #fff 20%, #f6f6f6 40%, #eee 60%, #f4f4f4 100%));
 
     span {
@@ -132,6 +133,7 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
     padding: 0;
     white-space: nowrap;
     border: 1px solid #aaa;
+    background-color: #fff;
     @include background(linear-gradient(#eee 1%, #fff 15%));
 
     .chosen-overflow {
@@ -381,6 +383,7 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
       border-bottom-right-radius: 0;
       -moz-border-radius-bottomleft: 0;
       border-bottom-left-radius: 0;
+      background-color: #fff;
       @include background-image(linear-gradient(#eee 20%, #fff 80%));
       box-shadow: 0 1px 0 #fff inset;
     }
@@ -521,6 +524,7 @@ $chosen-sprite-retina: image-url('chosen-sprite@2x.png');
 }
 
 .chosen-drop {
+  background-color: #fff;
   li.is-scope div i {
     margin-top: -6px;
     top: 50%;

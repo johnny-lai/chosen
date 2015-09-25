@@ -47,6 +47,7 @@ class CallbackDataSource extends DataSource
     item
   
   get_option_element: (array_index) ->
+    # array_index is set to item.value in this DataSource
     this.get_option_element_by_value(array_index)
   
   get_item: (array_index) ->

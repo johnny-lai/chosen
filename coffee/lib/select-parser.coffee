@@ -85,7 +85,7 @@ class SelectParser
     item
   
   get_option_element: (array_index) ->
-    @form_field.options[array_index]
+    @form_field.options[@get_item(array_index).options_index]
 
   get_item: (array_index) ->
     @parsed[array_index]

@@ -429,7 +429,7 @@ class Chosen extends AbstractChosen
       else
         item.selected = true
 
-        @source.get_option_element(item.array_index).selected = true
+        @source.get_option_element(item.array_index - item.group_offset).selected = true
         @selected_option_count = null
 
         if @is_multiple

@@ -2,6 +2,7 @@ class SelectParser
 
   constructor: (form_field) ->
     @form_field = form_field
+    @group_offset = 0
 
   add_node: (child) ->
     if child.nodeName.toUpperCase() is "OPTGROUP"
@@ -10,6 +11,7 @@ class SelectParser
       this.add_option child
 
   add_group: (group) ->
+    @group_offset++
     group_position = @parsed.length
     @parsed.push
       array_index: group_position
@@ -25,6 +27,7 @@ class SelectParser
         if group_position?
           @parsed[group_position].children += 1
         item = this.option_to_item option, group_disabled
+        item.group_offset = @group_offset
         item.array_index = @parsed.length
         item.options_index = @options_index
         item.disabled = group_disabled if group_disabled is true

@@ -535,7 +535,7 @@ class Chosen extends AbstractChosen
     @selected_item.addClass("chosen-single-with-deselect")
 
   get_search_text: ->
-    if @search_field.val() is @default_text then "" else $('<div/>').text($.trim(@search_field.val())).html()
+    if @search_field.val() is @default_text then "" else $('<div/>').html($.trim(@search_field.val())).text()
 
   get_selected_items: ->
     val = @form_field_jq.val()

@@ -540,7 +540,7 @@ class Chosen extends AbstractChosen
   get_selected_items: ->
     val = @form_field_jq.val()
     if not @is_multiple
-      val = if val == ''
+      val = if val == '' || val == null
         []
       else
         [ val ]

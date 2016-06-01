@@ -1,7 +1,7 @@
 class AbstractChosen
 
   constructor: (@form_field, @options={}) ->
-    return unless AbstractChosen.browser_is_supported()
+    return unless AbstractChosen.browser_is_supported(@options)
     @search_count = 0
     @scopes = []
     @scopes_of_selection = []
@@ -290,7 +290,8 @@ class AbstractChosen
 
   # class methods and variables ============================================================ 
 
-  @browser_is_supported: ->
+  @browser_is_supported: (options = {}) ->
+    return true if options.disable_browser_check
     if window.navigator.appName == "Microsoft Internet Explorer"
       if document.documentMode
         # IE 7 does not provide document.documentMode

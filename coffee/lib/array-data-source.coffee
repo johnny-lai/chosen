@@ -6,7 +6,7 @@ class ArrayDataSource extends DataSource
     item[k] = v for k, v of child
 
     item.text = item.label || item if not item.text?
-    item.html = item.text if not item.html?
+    item.html = this.escape_html(item.text) if not item.html?
     item.value = value if not item.value
     item.array_index = @results.length
     item.selected = item.selected || false

@@ -45,11 +45,18 @@ class Chosen extends AbstractChosen
 
     if @is_multiple
       choices_class = ['chosen-choices']
-      @container.html '<ul class="' + choices_class.join(' ') + '"><li class="search-field"><input type="text" value="' + @default_text + '" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="' + drop_classes.join(' ') + '"><ul class="chosen-results"></ul></div>'
+      @container.html '<ul class="' + 
+        this.escape_html(choices_class.join(' ')) + 
+        '"><li class="search-field"><input type="text" value="' +
+        this.escape_html(@default_text) + '" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="' + 
+        this.escape_html(drop_classes.join(' ')) + '"><ul class="chosen-results"></ul></div>'
     else
       a_classes = ['chosen-single', 'chosen-default']
       a_classes.push('chosen-single-with-scopes') if @options.show_scope_of_selected_item
-      @container.html '<a class="' + a_classes.join(' ') + '" tabindex="-1"><span>' + @default_text + '</span><div><b></b></div></a><div class="' + drop_classes.join(' ') + '"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul><div class="chosen-search-state"></div><div class="chosen-overflow"></div></div><ul class="chosen-results"></ul></div>'
+      @container.html '<a class="' + 
+        this.escape_html(a_classes.join(' ')) + '" tabindex="-1"><span>' +
+        this.escape_html(@default_text) + '</span><div><b></b></div></a><div class="' +
+        this.escape_html(drop_classes.join(' ')) + '"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul><div class="chosen-search-state"></div><div class="chosen-overflow"></div></div><ul class="chosen-results"></ul></div>'
 
     @form_field_jq.hide().after @container
     @dropdown = @container.find('div.chosen-drop').first()
@@ -468,7 +475,7 @@ class Chosen extends AbstractChosen
         html += '<li class="is-scope">'
         html += v.html  + '<div><i></i></div>'
         html += '</li>'
-      html += '<li>' + text + '</li>'
+      html += '<li>' + this.escape_html(text) + '</li>'
       html += '</ul>'
       @selected_item.find("span").html(html)
     else
@@ -535,7 +542,10 @@ class Chosen extends AbstractChosen
     @selected_item.addClass("chosen-single-with-deselect")
 
   get_search_text: ->
-    if @search_field.val() is @default_text then "" else $('<div/>').html($.trim(@search_field.val())).text()
+    if @search_field.val() is @default_text then "" else $.trim(@search_field.val())
+
+  escape_html: (text) ->
+    $('<div/>').text(text).html()
 
   get_selected_items: ->
     val = @form_field_jq.val()
@@ -558,7 +568,7 @@ class Chosen extends AbstractChosen
     this.result_do_highlight do_high if do_high?
 
   no_results: (terms) ->
-    no_results_html = $('<li class="no-results">' + @results_none_found + ' "<span></span>"</li>')
+    no_results_html = $('<li class="no-results">' + this.escape_html(@results_none_found) + ' "<span></span>"</li>')
     no_results_html.find("span").first().html(terms)
 
     @search_results.append no_results_html

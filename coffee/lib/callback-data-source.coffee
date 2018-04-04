@@ -37,7 +37,7 @@ class CallbackDataSource extends DataSource
     item = @results[child.value] || child
 
     item.text = item.label || item if not item.text?
-    item.html = item.text if not item.html?
+    item.html = this.escape_html(item.text) if not item.html?
     item.value = item.text if not item.value
     item.array_index = item.value
     item.selected = item.selected || false

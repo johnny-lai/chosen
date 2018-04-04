@@ -98,9 +98,9 @@ class AbstractChosen
     option_el.style.cssText = option.style
     option_el.setAttribute("data-option-array-index", option.array_index)
     option_el.innerHTML = if option.is_scope
-      option.search_text + '<div><i /></div>'
+      option.search_html + '<div><i /></div>'
     else
-      option.search_text
+      option.search_html
 
     this.outerHTML(option_el)
 
@@ -110,7 +110,7 @@ class AbstractChosen
 
     group_el = document.createElement("li")
     group_el.className = "group-result"
-    group_el.innerHTML = group.search_text
+    group_el.innerHTML = group.search_html
 
     this.outerHTML(group_el)
 
@@ -143,10 +143,11 @@ class AbstractChosen
     results = 0
 
     searchText = this.get_search_text()
-    escapedSearchText = searchText.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&")
+    searchHTML = this.escape_html(searchText)
+    escapedSearchHTML = searchHTML.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&")
     regexAnchor = if @search_contains then "" else "^"
-    regex = new RegExp(regexAnchor + escapedSearchText, 'i')
-    zregex = new RegExp(escapedSearchText, 'i')
+    regex = new RegExp(regexAnchor + escapedSearchHTML, 'i')
+    zregex = new RegExp(escapedSearchHTML, 'i')
 
     this.search () ->
       for option in @results_data
@@ -167,17 +168,17 @@ class AbstractChosen
                   
           unless option.group and not @group_search
 
-            option.search_text = if option.group then option.label else option.html
-            option.search_match = this.search_string_match(option.search_text, regex)
+            option.search_html = if option.group then this.escape_html(option.label) else option.html
+            option.search_match = this.search_string_match(option.search_html, regex)
             results += 1 if option.search_match and not option.group
 
             if option.always_show
               option.search_match = true
             else if option.search_match
               if searchText.length
-                startpos = option.search_text.search zregex
-                text = option.search_text.substr(0, startpos + searchText.length) + '</em>' + option.search_text.substr(startpos + searchText.length)
-                option.search_text = text.substr(0, startpos) + '<em>' + text.substr(startpos)
+                startpos = option.search_html.search zregex
+                html = option.search_html.substr(0, startpos + searchHTML.length) + '</em>' + option.search_html.substr(startpos + searchHTML.length)
+                option.search_html = html.substr(0, startpos) + '<em>' + html.substr(startpos)
 
               results_group.group_match = true if results_group?
             

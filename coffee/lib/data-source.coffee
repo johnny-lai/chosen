@@ -12,10 +12,10 @@ class DataSource
   get_option_element_by_value: (value) ->
     # Check if option already exists
     e = $(@form_field)
-    option = e.find('option[value="' + value + '"]')
+    option = e.find('option[value="' + this.escape_html(value) + '"]')
     if !option.length
-      e.append('<option value="' + value + '"></option>')
-      option = e.find('option[value="' + value + '"]')
+      e.append('<option value="' + this.escape_html(value) + '"></option>')
+      option = e.find('option[value="' + this.escape_html(value) + '"]')
     option[0]
     
   # Should return the option element represented by the array_index
@@ -81,6 +81,9 @@ class DataSource
 
   items_as_array: () ->
     @select_parser.select_to_array()
+
+  escape_html: (text) ->
+    $('<div/>').text(text).html()
 
 DataSource.instantiate = (form_field, source) ->
   if not source?

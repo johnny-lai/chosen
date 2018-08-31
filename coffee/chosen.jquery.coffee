@@ -1,7 +1,7 @@
 $ = jQuery
 
 $.fn.extend({
-  chosen: (options) ->
+  chosen: (options, value) ->
     # Do no harm and return as soon as possible for unsupported browsers, namely IE6 and IE7
     # Continue on if running IE document type but in compatibility mode
     return this unless AbstractChosen.browser_is_supported(options)
@@ -10,6 +10,8 @@ $.fn.extend({
       chosen = $this.data('chosen')
       if options is 'destroy' && chosen
         chosen.destroy()
+      else if options is 'searchValue' && chosen
+        chosen.search_value(value)
       else unless chosen
         $this.data('chosen', new Chosen(this, options))
 
@@ -710,5 +712,10 @@ class Chosen extends AbstractChosen
     else
       @containers.removeClass('chosen-overflowing')
 
-
     @is_overflowing = overflowing
+
+  search_value: (value) ->
+    input_field = @dropdown.find('.search-field input:first')
+
+    return input_field.val(value) if value?
+    input_field.val()

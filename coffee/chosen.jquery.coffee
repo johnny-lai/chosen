@@ -571,7 +571,7 @@ class Chosen extends AbstractChosen
 
   no_results: (terms) ->
     no_results_html = $('<li class="no-results">' + this.escape_html(@results_none_found) + ' "<span></span>"</li>')
-    no_results_html.find("span").first().html(terms)
+    no_results_html.find("span").first().html(this.escape_html(terms))
 
     @search_results.append no_results_html
 

@@ -14,7 +14,7 @@ class SelectParser
     @parsed.push
       array_index: group_position
       group: true
-      label: this.escapeExpression(group.label)
+      label: group.label
       children: 0
       disabled: group.disabled
     this.add_option( option, group_position, group.disabled ) for option in group.childNodes
@@ -37,21 +37,6 @@ class SelectParser
           options_index: @options_index
           empty: true
       @options_index += 1
-
-  escapeExpression: (text) ->
-    if not text? or text is false
-      return ""
-    unless /[\&\<\>\"\'\`]/.test(text)
-      return text
-    map =
-      "<": "&lt;"
-      ">": "&gt;"
-      '"': "&quot;"
-      "'": "&#x27;"
-      "`": "&#x60;"
-    unsafe_chars = /&(?!\w+;)|[\<\>\"\'\`]/g
-    text.replace unsafe_chars, (chr) ->
-      map[chr] || "&amp;"
 
   select_to_array: ->
     if not @parsed?

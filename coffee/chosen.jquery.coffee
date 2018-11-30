@@ -56,7 +56,7 @@ class Chosen extends AbstractChosen
       a_classes = ['chosen-single', 'chosen-default']
       a_classes.push('chosen-single-with-scopes') if @options.show_scope_of_selected_item
       @container.html '<a class="' + 
-        this.escape_html(a_classes.join(' ')) + '" tabindex="-1"><span>' +
+        this.escape_html(a_classes.join(' ')) + '" tabindex="0"><span>' +
         this.escape_html(@default_text) + '</span><div><b></b></div></a><div class="' +
         this.escape_html(drop_classes.join(' ')) + '"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul><div class="chosen-search-state"></div><div class="chosen-overflow"></div></div><ul class="chosen-results"></ul></div>'
 

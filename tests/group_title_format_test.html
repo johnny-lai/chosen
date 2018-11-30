@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="UTF-8">
+  <title>Chosen test</title>
+  <link rel="stylesheet" type="text/css" href="../public/chosen.css">
+  <style>
+    body{
+      font-family: Helvetica, Arial, sans-serif;
+      margin: 10vh 10vw;
+    }
+    #test_result{
+      display: block;
+      margin: 2em;
+      padding: 2em;
+    }
+    .pass{
+      background-color: #BDFF97;
+    }
+    .fail{
+      background-color: #FF9797;
+    }
+  </style>
+  <script src="https://unpkg.com/jquery@1.11.0/dist/jquery.js"></script>
+  <script src="../public/chosen.jquery.js"></script>
+</head>
+<body>
+  <pre id="test_result">
+    test running...
+  </pre>
+
+  <select id="select">
+    <optgroup label="A label with a single quote '">
+      <option>option 1</option>
+      <option>option 2</option>
+    </optgroup>
+    <optgroup label="A label with <div onclick='alert()'>attempted xss</div>">
+      <option>option 3</option>
+      <option>option 4</option>
+    </optgroup>
+  </select>
+
+  <script>
+    $("#select").chosen();
+
+    window.setTimeout(function(){
+      $("#select_chosen").trigger("mousedown");
+
+      window.setTimeout(function(){
+        var success = true;
+        var message = "";
+
+        if($(".group-result").first().html() == "A label with a single quote '"){
+          message = message + "single quote label displayed correctly\n";
+        } else {
+          message = message + "single quote label displayed incorrectly!\n";
+          success = false;
+        }
+
+        if($(".group-result").last().html() == "A label with &lt;div onclick='alert()'&gt;attempted xss&lt;/div&gt;"){
+          message = message + "xss label escaped correctly\n";
+        } else {
+          message = message + "xss escaped incorrectly!\n";
+          success = false;
+        }
+
+        success ? $("#test_result").addClass("pass") : $("#test_result").addClass("fail")
+        $("#test_result").html(message);
+      }, 200);
+    }, 200);
+
+  </script>
+</body>
+</html>

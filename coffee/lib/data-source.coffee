@@ -12,10 +12,10 @@ class DataSource
   get_option_element_by_value: (value) ->
     # Check if option already exists
     e = $(@form_field)
-    option = e.find('option[value="' + this.escape_html(value) + '"]')
+    option = e.find('option').filter (index, el) -> el.value == value
     if !option.length
-      e.append('<option value="' + this.escape_html(value) + '"></option>')
-      option = e.find('option[value="' + this.escape_html(value) + '"]')
+      option = $("<option />").attr("value", value).text(value)
+      e.append(option)
     option[0]
     
   # Should return the option element represented by the array_index

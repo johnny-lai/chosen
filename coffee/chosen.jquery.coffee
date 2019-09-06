@@ -87,6 +87,8 @@ class Chosen extends AbstractChosen
     this.results_build () ->
       @form_field_jq.trigger("chosen:ready", {chosen: this})
 
+    @live_screen_reader = $("<div id='liveForChosenScreenReader' aria-live='polite' class='aria-content'></div>")
+    $('body').append( @live_screen_reader )
 
     $("body").append( @dropdown )
 
@@ -135,6 +137,7 @@ class Chosen extends AbstractChosen
 
     @container.remove()
     @dropdown.remove()
+    @live_screen_reader.remove()
     @form_field_jq.removeData('chosen')
     @form_field_jq.show()
 
@@ -251,6 +254,7 @@ class Chosen extends AbstractChosen
         @search_results.scrollTop if (high_bottom - maxHeight) > 0 then (high_bottom - maxHeight) else 0
       else if high_top < visible_top
         @search_results.scrollTop high_top
+      this.set_text_for_screen_reader @result_highlight.text()
 
   result_clear_highlight: ->
     @result_highlight.removeClass "highlighted" if @result_highlight
@@ -369,8 +373,10 @@ class Chosen extends AbstractChosen
     if item.disabled
       choice.addClass 'search-choice-disabled'
     else
-      close_link = $('<a />', { class: 'search-choice-close', 'data-option-array-index': item.array_index })
+      close_link = $('<a />', { tabindex: '0', 'aria-label': this.escape_html(@remove_option_text + ' ' + item.text), class: 'search-choice-close', 'data-option-array-index': item.array_index, role: 'button' })
       close_link.bind 'click.chosen', (evt) => this.choice_destroy_link_click(evt)
+      close_link.bind 'keypress.chosen', (evt) =>
+        return this.choice_destroy_link_click(evt) if evt.which == 13
       choice.append close_link
 
     if item.is_scope
@@ -397,10 +403,20 @@ class Chosen extends AbstractChosen
       this.results_hide() if @is_multiple and this.choices_count() > 0 and @search_field.val().length < 1
       
       this.winnow_results() if item.is_scope
+      this.set_text_for_screen_reader(@removed_text + ' ' + item.text)
 
       link.parents('li').first().remove()
+      @delete_option = true
+      @search_field.focus()
       
       this.search_field_scale()
+
+  set_text_for_screen_reader: (text) ->
+    @live_screen_reader.text(text)
+    setTimeout (->
+      @live_screen_reader.text('')
+      return
+    ).bind(this), 2000
 
   results_reset: ->
     this.reset_single_select_options()
@@ -416,7 +432,7 @@ class Chosen extends AbstractChosen
     @selected_item.find("abbr").remove()
 
   result_select: (evt) ->
-    if @result_highlight
+    if @result_highlight && !@delete_option
       high = @result_highlight
 
       this.result_clear_highlight()
@@ -460,6 +476,8 @@ class Chosen extends AbstractChosen
 
         @form_field_jq.trigger "change", {'selected': item.value} if @is_multiple || @form_field.selectedIndex != @current_selectedIndex
         @current_selectedIndex = @form_field.selectedIndex
+    else
+      @delete_option = false
 
   single_set_selected_text: (text=@default_text) ->
     if text is @default_text

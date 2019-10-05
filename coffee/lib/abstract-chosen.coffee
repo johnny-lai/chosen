@@ -22,6 +22,7 @@ class AbstractChosen
     @active_field = false
     @mouse_on_container = false
     @results_showing = false
+    @delete_option = false
     @result_highlighted = null
     @allow_single_deselect = if @options.allow_single_deselect? and @form_field.options[0]? and @form_field.options[0].text is "" then @options.allow_single_deselect else false
     @show_scope_of_selected_item = @options.show_scope_of_selected_item || false
@@ -47,6 +48,8 @@ class AbstractChosen
       @default_text = @options.placeholder_text_single || @options.placeholder_text || AbstractChosen.default_single_text
 
     @results_none_found = @form_field.getAttribute("data-no_results_text") || @options.no_results_text || AbstractChosen.default_no_result_text
+    @remove_option_text = @options.remove_option_text || AbstractChosen.default_remove_option_text
+    @removed_text = @options.removed_text || AbstractChosen.default_removed_text
 
   mouse_enter: -> @mouse_on_container = true
   mouse_leave: -> @mouse_on_container = false
@@ -312,4 +315,6 @@ class AbstractChosen
   @default_multiple_text: "Select Some Options"
   @default_single_text: "Select an Option"
   @default_no_result_text: "No results match"
+  @default_remove_option_text: "Remove Option"
+  @default_removed_text: "Removed"
 

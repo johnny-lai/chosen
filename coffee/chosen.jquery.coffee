@@ -58,7 +58,7 @@ class Chosen extends AbstractChosen
       @container.html '<a class="' + 
         this.escape_html(a_classes.join(' ')) + '" tabindex="0"><span>' +
         this.escape_html(@default_text) + '</span><div><b></b></div></a><div class="' +
-        this.escape_html(drop_classes.join(' ')) + '"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input type="text" class="default" autocomplete="off" /></li></ul><div class="chosen-search-state"></div><div class="chosen-overflow"></div></div><ul class="chosen-results"></ul></div>'
+        this.escape_html(drop_classes.join(' ')) + '"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input tabindex="-1" type="text" class="default" autocomplete="off" /></li></ul><div class="chosen-search-state"></div><div class="chosen-overflow"></div></div><ul class="chosen-results"></ul></div>'
 
     @form_field_jq.hide().after @container
     @dropdown = @container.find('div.chosen-drop').first()
@@ -129,6 +129,9 @@ class Chosen extends AbstractChosen
       @search_choices.bind 'click.chosen', (evt) => this.choices_click(evt); return
     else
       @container.bind 'click.chosen', (evt) -> evt.preventDefault(); return # gobble click of anchor
+      @search_field.bind 'keydown.chosen', (evt) => tabCallback(this.container); return
+      if @overflow_container
+        @overflow_container.bind 'focusin.chosen', (evt) => this.update_position(evt); return
 
   destroy: ->
     $(document).unbind "click.chosen", @click_test_action
@@ -737,3 +740,46 @@ class Chosen extends AbstractChosen
 
     return input_field.val(value) if value?
     input_field.val()
+
+tabCallback = (container) ->
+  tabbable_element = null
+  if event.shiftKey and event.keyCode == 9
+    tabbable_element = siblingTabbableElement(container, 'prev', 'last')
+  else if event.keyCode == 9
+    tabbable_element = siblingTabbableElement(container, 'next', 'first')
+  if tabbable_element
+    tabbable_element.focus()
+    event.preventDefault()
+    return false
+  return
+
+siblingFields = (container, direction) ->
+  if direction == 'next'
+    container.nextAll()
+  else
+    container.prevAll()
+
+siblingTabbableElement = (container, direction, position) ->
+  referenceContainer = $(container)
+  tabbable_element = null
+  all_tabbale_elements = $(':tabbable')
+  loop
+    siblingFields(referenceContainer, direction).each (index, element) ->
+      if !tabbable_element
+        if $.inArray(element, all_tabbale_elements) > -1
+          tabbable_element = $(element)
+        else if (tabbable_child = tabbableChild(element, position)).length
+          tabbable_element = tabbable_child
+      return
+    if tabbable_element
+      break
+    referenceContainer = referenceContainer.parent()
+    unless referenceContainer.length != 0
+      break
+  tabbable_element
+
+tabbableChild = (element, position) ->
+  if position == 'first'
+    $(element).find(':tabbable').first()
+  else
+    $(element).find(':tabbable').last()

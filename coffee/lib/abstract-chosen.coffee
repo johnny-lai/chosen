@@ -50,6 +50,8 @@ class AbstractChosen
     @results_none_found = @form_field.getAttribute("data-no_results_text") || @options.no_results_text || AbstractChosen.default_no_result_text
     @remove_option_text = @options.remove_option_text || AbstractChosen.default_remove_option_text
     @removed_text = @options.removed_text || AbstractChosen.default_removed_text
+    @default_single_select_input_hint = @options.single_select_input_hint || AbstractChosen.default_single_select_input_hint
+    @default_single_select_field_hint = @options.single_select_field_hint || AbstractChosen.default_single_select_field_hint
 
   mouse_enter: -> @mouse_on_container = true
   mouse_leave: -> @mouse_on_container = false
@@ -67,11 +69,19 @@ class AbstractChosen
 
   results_option_build: (options) ->
     content = ''
+    ref_this = this
+    visible_options_counter = 0
+
+    @results_data.forEach (element) ->
+      if !element.group and element.search_match and ref_this.include_option_in_results(element)
+        visible_options_counter += 1
+        element.aria_posinset = visible_options_counter
+
     for data in @results_data
       if data.group
         content += this.result_add_group data
       else
-        content += this.result_add_option data
+        content += this.result_add_option data, visible_options_counter
 
     # this select logic pins on an awkward flag
     # we can make it better
@@ -84,7 +94,7 @@ class AbstractChosen
 
     content
 
-  result_add_option: (option) ->
+  result_add_option: (option, options_length) ->
     return '' unless option.search_match
     return '' unless this.include_option_in_results(option)
 
@@ -100,6 +110,10 @@ class AbstractChosen
     option_el.className = classes.join(" ")
     option_el.style.cssText = option.style
     option_el.setAttribute("data-option-array-index", option.array_index)
+    option_el.setAttribute("role", "option")
+    option_el.setAttribute("aria-posinset", option.aria_posinset)
+    option_el.setAttribute("aria-setsize", options_length)
+    option_el.setAttribute("id", this.search_results.attr('id') + '_option_' + option.array_index)
     option_el.innerHTML = if option.is_scope
       option.search_html + '<div><i /></div>'
     else
@@ -193,6 +207,7 @@ class AbstractChosen
       if results < 1 and searchText.length
         this.update_results_content ""
         this.no_results searchText
+        this.set_text_for_screen_reader(this.results_none_found)
       else
         this.update_results_content this.results_option_build()
         this.winnow_results_set_highlight()
@@ -317,4 +332,6 @@ class AbstractChosen
   @default_no_result_text: "No results match"
   @default_remove_option_text: "Remove Option"
   @default_removed_text: "Removed"
+  @default_single_select_field_hint = "Use space or down arrow key to open the combobox."
+  @default_single_select_input_hint = "When autocomplete results are available use up and down arrows to review and enter to select.  Touch device users, explore by touch or with swipe gestures."
 

@@ -58,7 +58,7 @@ class Chosen extends AbstractChosen
       @container.html '<span id="' + container_props.id + '_hint" style="display: none">"' + @default_single_select_field_hint + '"</span><a class="' +
         this.escape_html(a_classes.join(' ')) + '" tabindex="0"><span>' +
         this.escape_html(@default_text) + '</span><div><b></b></div></a><div class="' +
-        this.escape_html(drop_classes.join(' ')) + '" aria-describedby="' + container_props.id + '_hint ' + container_props.id + '_input_hint"><div class="chosen-search"><div class="chosen-scopes"><div class="search-field"><span id="' + container_props.id + '_input_hint" style="display:none">' + this.default_single_select_input_hint + '</span><input aria-owns="' + container_props.id + '_results" role="combobox" tabindex="-1" type="text" class="default" autocomplete="off" /></div></div><div class="chosen-search-state"></div><div class="chosen-overflow"></div></div><ul role="listbox" id="' + container_props.id + '_results" class="chosen-results"></ul></div>'
+        this.escape_html(drop_classes.join(' ')) + '"><div class="chosen-search"><div class="chosen-scopes"><div class="search-field"><input aria-owns="' + container_props.id + '_results" role="combobox" tabindex="-1" type="text" class="default" autocomplete="off" aria-expanded="false" aria-describedby="' + container_props.id + '_hint"/></div></div><div class="chosen-search-state"></div><div class="chosen-overflow"></div></div><ul role="listbox" id="' + container_props.id + '_results" class="chosen-results"></ul></div>'
 
     @form_field_jq.hide().after @container
     @dropdown = @container.find('div.chosen-drop').first()
@@ -266,17 +266,22 @@ class Chosen extends AbstractChosen
       if @is_multiple
         this.set_text_for_screen_reader @result_highlight.text()
       else
-        options_size_text = if el[0].attributes['aria-setsize'].value == '1' then 'result is' else 'results are'
-        selected_option_hint = @result_highlight.text() + ' selected ' + '(' + el[0].attributes['aria-posinset'].value + ' of ' + el[0].attributes['aria-setsize'].value + ')' + '.'
-        available_options_hint = el[0].attributes['aria-setsize'].value + ' ' + options_size_text + ' available.'
-        highlighted_option_hint = @result_highlight.text() + ' (' + el[0].attributes['aria-posinset'].value + ' of ' + el[0].attributes['aria-setsize'].value + ')' + ' is highlighted.'
-        single_select_screen_reader_message = selected_option_hint + ' ' + available_options_hint + ' ' + highlighted_option_hint
+        @search_field.attr("aria-activedescendant", @result_highlight.attr("id"))
+
+        options_size_text = if el[0].attributes['aria-setsize'].value == '1' then @default_single_select_result_singular_hint else @default_single_select_results_plural_hint
+
+        available_options_hint = options_size_text.replace("aria_setsize", el[0].attributes["aria-setsize"].value)
+
+        highlighted_option_hint = @default_single_select_highlighted_result_hint.replace("result_highlight_text",@result_highlight.text()).replace("aria_posinset", el[0].attributes["aria-posinset"].value).replace("aria_setsize", el[0].attributes["aria-setsize"].value)
+
+        single_select_screen_reader_message = available_options_hint + ' ' + highlighted_option_hint
         this.set_text_for_screen_reader single_select_screen_reader_message
 
   result_clear_highlight: ->
     if @result_highlight
       @result_highlight.removeClass "highlighted"
       @result_highlight.removeAttr('aria-selected')
+      @search_field.attr("aria-activedescendant", "")
     @result_highlight = null
 
   results_show: ->
@@ -345,7 +350,6 @@ class Chosen extends AbstractChosen
         "left": "-9999px"
       }
       @search_field.attr('aria-expanded', 'false')
-      @search_field.removeAttr("aria-activedescendant")
     @results_showing = false
 
 
@@ -494,7 +498,10 @@ class Chosen extends AbstractChosen
         # Search for refinement
         this.winnow_results() if @results_showing
       else
-        this.results_hide() unless (evt.metaKey or evt.ctrlKey) and @is_multiple
+        unless (evt.metaKey or evt.ctrlKey) and @is_multiple
+          this.results_hide()
+          if @selected_item.find("span").first().text().trim()
+            this.set_text_for_screen_reader(@selected_item.find("span").first().text())
 
         @form_field_jq.trigger "change", {'selected': item.value} if @is_multiple || @form_field.selectedIndex != @current_selectedIndex
         @current_selectedIndex = @form_field.selectedIndex
@@ -525,7 +532,7 @@ class Chosen extends AbstractChosen
     if text == this.default_text
       @search_field.attr("aria-label", @input_aria_label)
     else
-      @search_field.attr("aria-label", @input_aria_label + ". (" + text + ")")
+      @search_field.attr("aria-label", @input_aria_label + ". " + text)
 
     this.search_field_scale()
 
@@ -638,7 +645,10 @@ class Chosen extends AbstractChosen
       if prev_sibs.length
         this.result_do_highlight prev_sibs.first()
       else
-        this.results_hide() if this.choices_count() > 0
+        if this.choices_count() > 0
+          this.results_hide()
+          if @selected_item.find("span").first().text().trim()
+              this.set_text_for_screen_reader(@selected_item.find("span").first().text())
         this.result_clear_highlight()
 
   keydown_backstroke: ->

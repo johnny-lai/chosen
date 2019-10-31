@@ -744,16 +744,19 @@ class Chosen extends AbstractChosen
     input_field.val()
 
   set_label_attributes: () ->
-    associated_select_field = $('select[id="' + $(@container).attr('id').replace('_chosen', '') + '"]')
-    if aria_describedby = associated_select_field.attr('aria-describedby')
-      @search_field.attr 'aria-describedby', aria_describedby
+    if $(@container).attr('id')
+      associated_select_field = $('select[id="' + $(@container).attr('id').replace('_chosen', '') + '"]')
+      if aria_describedby = associated_select_field.attr('aria-describedby')
+        @search_field.attr 'aria-describedby', aria_describedby
 
-    if aria_labelledby = associated_select_field.attr('aria-labelledby')
-      @search_field.attr 'aria-labelledby', aria_labelledby
-    else if aria_label = associated_select_field.attr('aria-label')
-      @search_field.attr 'aria-label', aria_label
-    else if aria_label = $('label[for="' + associated_select_field.attr('id') + '"]')
-      @search_field.attr 'aria-label', aria_label.text()
+      if aria_labelledby = associated_select_field.attr('aria-labelledby')
+        @search_field.attr 'aria-labelledby', aria_labelledby
+      else if aria_label = associated_select_field.attr('aria-label')
+        @search_field.attr 'aria-label', aria_label
+      else if aria_label = $('label[for="' + associated_select_field.attr('id') + '"]')
+        @search_field.attr 'aria-label', aria_label.text()
+    else if label = $(@container).prevAll('label').first().text()
+      @search_field.attr('aria-label', label)
 
 tabCallback = (container) ->
   tabbable_element = null

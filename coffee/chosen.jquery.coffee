@@ -73,6 +73,9 @@ class Chosen extends AbstractChosen
 
     @search_no_results = @container.find('li.no-results').first()
 
+    if @search_field
+        @set_label_attributes()
+
     if @is_multiple
       @search_choices = @container.find('ul.chosen-choices').first()
       @search_container = @container.find('li.search-field').first()
@@ -80,8 +83,6 @@ class Chosen extends AbstractChosen
       @search_container = @container.find('li.search-field').first()
       @search_scroller = @container.find('ul.chosen-scopes')
       @selected_item = @container.find('.chosen-single').first()
-      if @search_field
-        @set_label_attributes()
     
     this.set_tab_index()
     this.set_label_behavior()

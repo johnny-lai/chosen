@@ -55,10 +55,10 @@ class Chosen extends AbstractChosen
     else
       a_classes = ['chosen-single', 'chosen-default']
       a_classes.push('chosen-single-with-scopes') if @options.show_scope_of_selected_item
-      @container.html '<a class="' + 
+      @container.html '<span id="' + container_props.id + '_hint" style="display: none">"' + @default_single_select_field_hint + '"</span><a class="' +
         this.escape_html(a_classes.join(' ')) + '" tabindex="0"><span>' +
         this.escape_html(@default_text) + '</span><div><b></b></div></a><div class="' +
-        this.escape_html(drop_classes.join(' ')) + '"><div class="chosen-search"><ul class="chosen-scopes"><li class="search-field"><input tabindex="-1" type="text" class="default" autocomplete="off" /></li></ul><div class="chosen-search-state"></div><div class="chosen-overflow"></div></div><ul class="chosen-results"></ul></div>'
+        this.escape_html(drop_classes.join(' ')) + '"><div class="chosen-search"><div class="chosen-scopes"><div class="search-field"><input aria-owns="' + container_props.id + '_results" role="combobox" tabindex="-1" type="text" class="default" autocomplete="off" aria-expanded="false" aria-describedby="' + container_props.id + '_hint"/></div></div><div class="chosen-search-state"></div><div class="chosen-overflow"></div></div><ul role="listbox" id="' + container_props.id + '_results" class="chosen-results"></ul></div>'
 
     @form_field_jq.hide().after @container
     @dropdown = @container.find('div.chosen-drop').first()
@@ -80,8 +80,9 @@ class Chosen extends AbstractChosen
       @search_choices = @container.find('ul.chosen-choices').first()
       @search_container = @container.find('li.search-field').first()
     else
-      @search_container = @container.find('li.search-field').first()
-      @search_scroller = @container.find('ul.chosen-scopes')
+      @input_aria_label = ''
+      @search_container = @container.find('div.search-field').first()
+      @search_scroller = @container.find('div.chosen-scopes')
       @selected_item = @container.find('.chosen-single').first()
     
     this.set_tab_index()
@@ -228,8 +229,10 @@ class Chosen extends AbstractChosen
         if @disable_search or @results_data.length <= @disable_search_threshold
           @search_field[0].readOnly = true
           @containers.addClass "chosen-container-single-nosearch"
+          @search_field.removeAttr("aria-autocomplete")
         else
           @search_field[0].readOnly = false
+          @search_field.attr("aria-autocomplete","list")
           @containers.removeClass "chosen-container-single-nosearch"
 
       this.update_results_content this.results_option_build({first:true})
@@ -248,6 +251,7 @@ class Chosen extends AbstractChosen
 
       @result_highlight = el
       @result_highlight.addClass "highlighted"
+      @result_highlight.attr('aria-selected', 'true')
 
       maxHeight = parseInt @search_results.css("maxHeight"), 10
       visible_top = @search_results.scrollTop()
@@ -260,10 +264,25 @@ class Chosen extends AbstractChosen
         @search_results.scrollTop if (high_bottom - maxHeight) > 0 then (high_bottom - maxHeight) else 0
       else if high_top < visible_top
         @search_results.scrollTop high_top
-      this.set_text_for_screen_reader @result_highlight.text()
+      if @is_multiple
+        this.set_text_for_screen_reader @result_highlight.text()
+      else
+        @search_field.attr("aria-activedescendant", @result_highlight.attr("id"))
+
+        options_size_text = if el[0].attributes['aria-setsize'].value == '1' then @default_single_select_result_singular_hint else @default_single_select_results_plural_hint
+
+        available_options_hint = options_size_text.replace("aria_setsize", el[0].attributes["aria-setsize"].value)
+
+        highlighted_option_hint = @default_single_select_highlighted_result_hint.replace("result_highlight_text",@result_highlight.text()).replace("aria_posinset", el[0].attributes["aria-posinset"].value).replace("aria_setsize", el[0].attributes["aria-setsize"].value)
+
+        single_select_screen_reader_message = available_options_hint + ' ' + highlighted_option_hint
+        this.set_text_for_screen_reader single_select_screen_reader_message
 
   result_clear_highlight: ->
-    @result_highlight.removeClass "highlighted" if @result_highlight
+    if @result_highlight
+      @result_highlight.removeClass "highlighted"
+      @result_highlight.removeAttr('aria-selected')
+      @search_field.attr("aria-activedescendant", "")
     @result_highlight = null
 
   results_show: ->
@@ -280,6 +299,7 @@ class Chosen extends AbstractChosen
     @search_field.focus()
     @search_field.val @search_field.val()
     this.search_field_scale()
+    @search_field.attr('aria-expanded', 'true')
 
     this.winnow_results()
 
@@ -330,6 +350,7 @@ class Chosen extends AbstractChosen
       @dropdown.css {
         "left": "-9999px"
       }
+      @search_field.attr('aria-expanded', 'false')
     @results_showing = false
 
 
@@ -478,7 +499,10 @@ class Chosen extends AbstractChosen
         # Search for refinement
         this.winnow_results() if @results_showing
       else
-        this.results_hide() unless (evt.metaKey or evt.ctrlKey) and @is_multiple
+        unless (evt.metaKey or evt.ctrlKey) and @is_multiple
+          this.results_hide()
+          if @selected_item.find("span").first().text().trim()
+            this.set_text_for_screen_reader(@selected_item.find("span").first().text())
 
         @form_field_jq.trigger "change", {'selected': item.value} if @is_multiple || @form_field.selectedIndex != @current_selectedIndex
         @current_selectedIndex = @form_field.selectedIndex
@@ -506,6 +530,10 @@ class Chosen extends AbstractChosen
       @selected_item.find("span").html(html)
     else
       @selected_item.find("span").text(text)
+    if text == this.default_text
+      @search_field.attr("aria-label", @input_aria_label)
+    else
+      @search_field.attr("aria-label", @input_aria_label + ". " + text)
 
     this.search_field_scale()
 
@@ -618,7 +646,10 @@ class Chosen extends AbstractChosen
       if prev_sibs.length
         this.result_do_highlight prev_sibs.first()
       else
-        this.results_hide() if this.choices_count() > 0
+        if this.choices_count() > 0
+          this.results_hide()
+          if @selected_item.find("span").first().text().trim()
+              this.set_text_for_screen_reader(@selected_item.find("span").first().text())
         this.result_clear_highlight()
 
   keydown_backstroke: ->
@@ -758,6 +789,8 @@ class Chosen extends AbstractChosen
         @search_field.attr 'aria-label', aria_label.text()
     else if label = $(@container).prevAll('label').first().text()
       @search_field.attr('aria-label', label)
+    if @search_field.attr('aria-label')
+      @input_aria_label = @search_field.attr('aria-label')
 
 tabCallback = (container) ->
   tabbable_element = null

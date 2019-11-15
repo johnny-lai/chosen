@@ -50,6 +50,10 @@ class AbstractChosen
     @results_none_found = @form_field.getAttribute("data-no_results_text") || @options.no_results_text || AbstractChosen.default_no_result_text
     @remove_option_text = @options.remove_option_text || AbstractChosen.default_remove_option_text
     @removed_text = @options.removed_text || AbstractChosen.default_removed_text
+    @default_single_select_field_hint = @options.single_select_field_hint || AbstractChosen.default_single_select_field_hint
+    @default_single_select_result_singular_hint = @options.single_select_result_singular_hint || AbstractChosen.default_single_select_result_singular_hint
+    @default_single_select_results_plural_hint = @options.single_select_results_plural_hint || AbstractChosen.default_single_select_results_plural_hint
+    @default_single_select_highlighted_result_hint = @options.single_select_highlighted_result_hint || AbstractChosen.default_single_select_highlighted_result_hint
 
   mouse_enter: -> @mouse_on_container = true
   mouse_leave: -> @mouse_on_container = false
@@ -67,11 +71,19 @@ class AbstractChosen
 
   results_option_build: (options) ->
     content = ''
+    ref_this = this
+    visible_options_counter = 0
+
+    @results_data.forEach (element) ->
+      if !element.group and element.search_match and ref_this.include_option_in_results(element)
+        visible_options_counter += 1
+        element.aria_posinset = visible_options_counter
+
     for data in @results_data
       if data.group
         content += this.result_add_group data
       else
-        content += this.result_add_option data
+        content += this.result_add_option data, visible_options_counter
 
     # this select logic pins on an awkward flag
     # we can make it better
@@ -84,7 +96,7 @@ class AbstractChosen
 
     content
 
-  result_add_option: (option) ->
+  result_add_option: (option, options_length) ->
     return '' unless option.search_match
     return '' unless this.include_option_in_results(option)
 
@@ -100,6 +112,10 @@ class AbstractChosen
     option_el.className = classes.join(" ")
     option_el.style.cssText = option.style
     option_el.setAttribute("data-option-array-index", option.array_index)
+    option_el.setAttribute("role", "option")
+    option_el.setAttribute("aria-posinset", option.aria_posinset)
+    option_el.setAttribute("aria-setsize", options_length)
+    option_el.setAttribute("id", this.search_results.attr('id') + '_option_' + option.array_index)
     option_el.innerHTML = if option.is_scope
       option.search_html + '<div><i /></div>'
     else
@@ -193,6 +209,7 @@ class AbstractChosen
       if results < 1 and searchText.length
         this.update_results_content ""
         this.no_results searchText
+        this.set_text_for_screen_reader(this.results_none_found)
       else
         this.update_results_content this.results_option_build()
         this.winnow_results_set_highlight()
@@ -242,9 +259,20 @@ class AbstractChosen
           this.results_search()
       when 13
         evt.preventDefault()
-        this.result_select(evt) if this.results_showing
+        if this.results_showing
+          if @result_highlight and not @delete_option
+              item = @source.get_item(@result_highlight[0].getAttribute("data-option-array-index"))
+              if not item.is_scope and not @is_multiple
+                if item.text == null or item.text == @default_text
+                  @search_field.attr("aria-label", @input_aria_label);
+                else
+                  @search_field.attr("aria-label", @input_aria_label + ". " + item.text)
+          this.result_select(evt)
       when 27
-        this.results_hide() if @results_showing
+        if @results_showing
+          this.results_hide()
+          if not @is_multiple and @selected_item.find("span").first().text().trim()
+            this.set_text_for_screen_reader(@selected_item.find("span").first().text())
         return true
       when 9, 38, 40, 16, 91, 17
         # don't do anything on these keys
@@ -317,4 +345,7 @@ class AbstractChosen
   @default_no_result_text: "No results match"
   @default_remove_option_text: "Remove Option"
   @default_removed_text: "Removed"
-
+  @default_single_select_field_hint = "Use space or down arrow key to open the combobox."
+  @default_single_select_result_singular_hint = "aria_setsize result is available."
+  @default_single_select_results_plural_hint = "aria_setsize results are available."
+  @default_single_select_highlighted_result_hint = "result_highlight_text. aria_posinset of aria_setsize is highlighted."

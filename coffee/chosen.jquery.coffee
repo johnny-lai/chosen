@@ -694,6 +694,9 @@ class Chosen extends AbstractChosen
         evt.preventDefault()
         this.keydown_arrow()
         break
+      when 27
+        evt.preventDefault() if this.results_showing
+        break
 
   search_field_scale: ->
     if true #@is_multiple

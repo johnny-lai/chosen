@@ -54,6 +54,10 @@ class AbstractChosen
     @default_single_select_result_singular_hint = @options.single_select_result_singular_hint || AbstractChosen.default_single_select_result_singular_hint
     @default_single_select_results_plural_hint = @options.single_select_results_plural_hint || AbstractChosen.default_single_select_results_plural_hint
     @default_single_select_highlighted_result_hint = @options.single_select_highlighted_result_hint || AbstractChosen.default_single_select_highlighted_result_hint
+    @default_selected_option_hint = @options.default_selected_option_hint || AbstractChosen.default_selected_option_hint;
+    @default_multi_select_selected_options_hint = @options.default_multi_select_selected_options_hint || AbstractChosen.default_multi_select_selected_options_hint;
+    @default_multi_select_selected_option_hint = @options.default_multi_select_selected_option_hint || AbstractChosen.default_multi_select_selected_option_hint;
+    @default_multi_select_no_options_selected_hint = @options.default_multi_select_no_options_selected_hint || AbstractChosen.default_multi_select_no_options_selected_hint;
 
   mouse_enter: -> @mouse_on_container = true
   mouse_leave: -> @mouse_on_container = false
@@ -272,7 +276,7 @@ class AbstractChosen
         if @results_showing
           this.results_hide()
           if not @is_multiple and @selected_item.find("span").first().text().trim()
-            this.set_text_for_screen_reader(@selected_item.find("span").first().text())
+            this.set_text_for_screen_reader(@default_selected_option_hint.replace("option_value", @selected_item.find("span").first().text()))
         return true
       when 9, 38, 40, 16, 91, 17
         # don't do anything on these keys
@@ -349,3 +353,7 @@ class AbstractChosen
   @default_single_select_result_singular_hint = "aria_setsize result is available."
   @default_single_select_results_plural_hint = "aria_setsize results are available."
   @default_single_select_highlighted_result_hint = "result_highlight_text. aria_posinset of aria_setsize is highlighted."
+  @default_selected_option_hint = "option_value selected."
+  @default_multi_select_selected_options_hint = "aria_label multiselect combobox has selected_options_size options selected."
+  @default_multi_select_selected_option_hint = "aria_label multiselect combobox has selected_options_size option selected."
+  @default_multi_select_no_options_selected_hint = "aria_label multiselect combobox has no options selected."

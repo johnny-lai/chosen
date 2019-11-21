@@ -47,11 +47,11 @@ class Chosen extends AbstractChosen
 
     if @is_multiple
       choices_class = ['chosen-choices']
-      @container.html '<ul class="' + 
+      @container.html '<div class="' +
         this.escape_html(choices_class.join(' ')) + 
-        '"><li class="search-field"><input type="text" value="' +
-        this.escape_html(@default_text) + '" class="default" autocomplete="off" style="width:25px;" /></li></ul><div class="' + 
-        this.escape_html(drop_classes.join(' ')) + '"><ul class="chosen-results"></ul></div>'
+        '"><div class="search-field"><input role="combobox" aria-expanded="false" aria-owns="' + this.escape_html(container_props.id + '_results') + '" type="text" value="' +
+        this.escape_html(@default_text) + '" class="default" autocomplete="off" style="width:25px;" /></div></div><div class="' +
+        this.escape_html(drop_classes.join(' ')) + '"><ul role="listbox" id="' + this.escape_html(container_props.id + '_results') + '" class="chosen-results"></ul></div>'
     else
       a_classes = ['chosen-single', 'chosen-default']
       a_classes.push('chosen-single-with-scopes') if @options.show_scope_of_selected_item
@@ -72,15 +72,18 @@ class Chosen extends AbstractChosen
     @search_results = @container.find('ul.chosen-results').first()
 
     @search_no_results = @container.find('li.no-results').first()
+    @input_aria_label = ''
+    if @search_field
+      @set_label_attributes()
+    @focus_input = true
 
     if @search_field
         @set_label_attributes()
 
     if @is_multiple
-      @search_choices = @container.find('ul.chosen-choices').first()
-      @search_container = @container.find('li.search-field').first()
+      @search_choices = @container.find('div.chosen-choices').first()
+      @search_container = @container.find('div.search-field').first()
     else
-      @input_aria_label = ''
       @search_container = @container.find('div.search-field').first()
       @search_scroller = @container.find('div.chosen-scopes')
       @selected_item = @container.find('.chosen-single').first()
@@ -102,6 +105,8 @@ class Chosen extends AbstractChosen
     @container.bind 'mouseup.chosen', (evt) => this.container_mouseup(evt); return
     @container.bind 'mouseenter.chosen', (evt) => this.mouse_enter(evt); return
     @container.bind 'mouseleave.chosen', (evt) => this.mouse_leave(evt); return
+    @container.bind 'keyup.chosen', (evt) => this.tabContainerCallback(evt); return
+
     @dropdown.bind 'mouseenter.chosen', (evt) => this.mouse_enter(evt); return
     @dropdown.bind 'mouseleave.chosen', (evt) => this.mouse_leave(evt); return
 
@@ -126,7 +131,20 @@ class Chosen extends AbstractChosen
     @search_field.bind 'blur.chosen', (evt) => this.input_blur(evt); return
     @search_field.bind 'keyup.chosen', (evt) => this.keyup_checker(evt); return
     @search_field.bind 'keydown.chosen', (evt) => this.keydown_checker(evt); return
-    @search_field.bind 'focus.chosen', (evt) => this.input_focus(evt); return
+    @search_field.bind 'focus.chosen', (evt) =>
+      if @is_multiple
+        $(window).keydown (e) ->
+          code = if e.keyCode then e.keyCode else e.which
+          if code == 9
+            _this.focus_input = false
+            _this.search_field.val ''
+            _this.activate_field()
+        if @focus_input
+          this.input_focus evt
+        @focus_input = true
+      else
+        this.input_focus evt
+      return
     @search_field.bind 'click.chosen', (evt) => evt.stopPropagation(); return
 
     if @is_multiple
@@ -206,8 +224,8 @@ class Chosen extends AbstractChosen
   activate_field: ->
     @container.addClass "chosen-container-active"
     @active_field = true
-
-    @search_field.focus()
+    if @focus_input
+      @search_field.focus()
     @search_field.val(@search_field.val())
 
 
@@ -223,7 +241,8 @@ class Chosen extends AbstractChosen
 
     this.search () ->
       if @is_multiple
-        @search_choices.find("li.search-choice").remove()
+        @search_choices.find("div.search-choice").remove()
+        @search_field.attr("aria-autocomplete", "list")
       else if not @is_multiple
         this.single_set_selected_text()
         if @disable_search or @results_data.length <= @disable_search_threshold
@@ -264,19 +283,16 @@ class Chosen extends AbstractChosen
         @search_results.scrollTop if (high_bottom - maxHeight) > 0 then (high_bottom - maxHeight) else 0
       else if high_top < visible_top
         @search_results.scrollTop high_top
-      if @is_multiple
-        this.set_text_for_screen_reader @result_highlight.text()
-      else
-        @search_field.attr("aria-activedescendant", @result_highlight.attr("id"))
+      @search_field.attr("aria-activedescendant", @result_highlight.attr("id"))
 
-        options_size_text = if el[0].attributes['aria-setsize'].value == '1' then @default_single_select_result_singular_hint else @default_single_select_results_plural_hint
+      options_size_text = if el[0].attributes['aria-setsize'].value == '1' then @default_single_select_result_singular_hint else @default_single_select_results_plural_hint
 
-        available_options_hint = options_size_text.replace("aria_setsize", el[0].attributes["aria-setsize"].value)
+      available_options_hint = options_size_text.replace("aria_setsize", el[0].attributes["aria-setsize"].value)
 
-        highlighted_option_hint = @default_single_select_highlighted_result_hint.replace("result_highlight_text",@result_highlight.text()).replace("aria_posinset", el[0].attributes["aria-posinset"].value).replace("aria_setsize", el[0].attributes["aria-setsize"].value)
+      highlighted_option_hint = @default_single_select_highlighted_result_hint.replace("result_highlight_text",@result_highlight.text()).replace("aria_posinset", el[0].attributes["aria-posinset"].value).replace("aria_setsize", el[0].attributes["aria-setsize"].value)
 
-        single_select_screen_reader_message = available_options_hint + ' ' + highlighted_option_hint
-        this.set_text_for_screen_reader single_select_screen_reader_message
+      single_select_screen_reader_message = available_options_hint + ' ' + highlighted_option_hint
+      this.set_text_for_screen_reader single_select_screen_reader_message
 
   result_clear_highlight: ->
     if @result_highlight
@@ -395,7 +411,7 @@ class Chosen extends AbstractChosen
     this.result_narrow item
     
   choice_build: (item) ->
-    choice = $('<li />', { class: "search-choice" }).html("<span>#{item.html}</span>")
+    choice = $('<div />', { class: "search-choice" }).html("<span>#{item.html}</span>")
 
     if item.disabled
       choice.addClass 'search-choice-disabled'
@@ -412,6 +428,8 @@ class Chosen extends AbstractChosen
       choice.append(choice_arrow)
 
     @search_container.before choice
+    if @is_multiple and (first_selected_option = @search_choices.find('a.search-choice-close').first()) and first_selected_option.length
+      first_selected_option.attr 'aria-label', this.selected_options_hint_text() + ' ' + @remove_option_text + ' ' + first_selected_option.prev('span').text()
 
   choice_destroy_link_click: (evt) ->
     evt.preventDefault()
@@ -430,9 +448,15 @@ class Chosen extends AbstractChosen
       this.results_hide() if @is_multiple and this.choices_count() > 0 and @search_field.val().length < 1
       
       this.winnow_results() if item.is_scope
-      this.set_text_for_screen_reader(@removed_text + ' ' + item.text)
 
-      link.parents('li').first().remove()
+      link.parents('div').first().remove()
+      if @is_multiple
+        this.set_text_for_screen_reader(@removed_text + ' ' + item.text + ' . ' + this.selected_options_hint_text() + ' ' + @default_single_select_field_hint)
+        if (first_selected_option = @search_choices.find('a.search-choice-close').first()) and first_selected_option.length
+          first_selected_option.attr('aria-label', this.selected_options_hint_text() + ' ' + @remove_option_text + ' ' + first_selected_option.prev('span').text())
+      else
+        @set_text_for_screen_reader @removed_text + ' ' + item.text
+
       @delete_option = true
       @search_field.focus()
       
@@ -501,8 +525,12 @@ class Chosen extends AbstractChosen
       else
         unless (evt.metaKey or evt.ctrlKey) and @is_multiple
           this.results_hide()
-          if @selected_item.find("span").first().text().trim()
-            this.set_text_for_screen_reader(@selected_item.find("span").first().text())
+          if @is_multiple
+            if last_option_text = @search_choices.find('div.search-choice span').last().text()
+              this.set_text_for_screen_reader(@default_selected_option_hint.replace('option_value', last_option_text) + ' ' + @selected_options_hint_text() + ' ' + @default_single_select_field_hint)
+          else
+            if @selected_item.find('span').first().text().trim()
+              this.set_text_for_screen_reader(@default_selected_option_hint.replace('option_value', @selected_item.find('span').first().text()))
 
         @form_field_jq.trigger "change", {'selected': item.value} if @is_multiple || @form_field.selectedIndex != @current_selectedIndex
         @current_selectedIndex = @form_field.selectedIndex
@@ -520,13 +548,13 @@ class Chosen extends AbstractChosen
     this.result_scopes_build()
 
     if @options.show_scope_of_selected_item
-      html = '<ul class="chosen-scopes">'
+      html = '<div class="chosen-scopes">'
       for v in @scopes_of_selection
-        html += '<li class="is-scope">'
+        html += '<div class="is-scope">'
         html += v.html  + '<div><i></i></div>'
-        html += '</li>'
-      html += '<li>' + this.escape_html(text) + '</li>'
-      html += '</ul>'
+        html += '</div>'
+      html += '<div>' + this.escape_html(text) + '</div>'
+      html += '</div>'
       @selected_item.find("span").html(html)
     else
       @selected_item.find("span").text(text)
@@ -648,8 +676,10 @@ class Chosen extends AbstractChosen
       else
         if this.choices_count() > 0
           this.results_hide()
-          if @selected_item.find("span").first().text().trim()
-              this.set_text_for_screen_reader(@selected_item.find("span").first().text())
+          if not @is_multiple and @selected_item.find('span').first().text().trim()
+            this.set_text_for_screen_reader(@default_selected_option_hint.replace('option_value', @selected_item.find('span').first().text()))
+        if @is_multiple
+          this.results_hide()
         this.result_clear_highlight()
 
   keydown_backstroke: ->
@@ -657,7 +687,7 @@ class Chosen extends AbstractChosen
       this.choice_destroy @pending_backstroke.find("a").first()
       this.clear_backstroke()
     else
-      next_available_destroy = @search_container.siblings("li.search-choice").last()
+      next_available_destroy = @search_container.siblings("div.search-choice").last()
       if next_available_destroy.length and not next_available_destroy.hasClass("search-choice-disabled")
         @pending_backstroke = next_available_destroy
         if @single_backstroke_delete
@@ -794,6 +824,28 @@ class Chosen extends AbstractChosen
       @search_field.attr('aria-label', label)
     if @search_field.attr('aria-label')
       @input_aria_label = @search_field.attr('aria-label')
+
+  tabContainerCallback: (evt) ->
+    if @is_multiple and evt.keyCode == 9
+      @focus_input = false
+      @search_field.val ''
+      @activate_field()
+      if evt.target.tagName == 'INPUT'
+        this.set_text_for_screen_reader(this.selected_options_hint_text() + ' ' + @default_single_select_field_hint)
+
+  selected_options_hint_text: () ->
+    selected_options_length = @search_choices.find('div.search-choice').length
+    switch selected_options_length
+      when 0
+        text = @default_multi_select_no_options_selected_hint
+        break
+      when 1
+        text = @default_multi_select_selected_option_hint.replace('selected_options_size', selected_options_length)
+        break
+      else
+        text = @default_multi_select_selected_options_hint.replace('selected_options_size', selected_options_length)
+        break
+    text = text.replace('aria_label', @search_field.attr('aria-label'))
 
 tabCallback = (container) ->
   tabbable_element = null

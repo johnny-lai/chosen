@@ -548,13 +548,13 @@ class Chosen extends AbstractChosen
     this.result_scopes_build()
 
     if @options.show_scope_of_selected_item
-      html = '<div class="chosen-scopes">'
+      html = '<ul class="chosen-scopes">'
       for v in @scopes_of_selection
-        html += '<div class="is-scope">'
+        html += '<li class="is-scope">'
         html += v.html  + '<div><i></i></div>'
-        html += '</div>'
-      html += '<div>' + this.escape_html(text) + '</div>'
-      html += '</div>'
+        html += '</li>'
+      html += '<li>' + this.escape_html(text) + '</li>'
+      html += '</ul>'
       @selected_item.find("span").html(html)
     else
       @selected_item.find("span").text(text)

@@ -577,6 +577,7 @@ class Chosen extends AbstractChosen
 
   result_clear_scope: ->
     @scopes = []
+    @search_container.siblings("div.is-scope").remove()
     @search_container.siblings("li.is-scope").remove()
     
   result_scopes_build: ->

@@ -94,7 +94,12 @@ class Chosen extends AbstractChosen
     this.results_build () ->
       @form_field_jq.trigger("chosen:ready", {chosen: this})
 
-    @live_screen_reader = $("<div id='liveForChosenScreenReader' aria-live='polite' class='aria-content'></div>")
+    reader = $("#liveForChosenScreenReader")
+    if reader.length == 0
+      @live_screen_reader = $("<div id='liveForChosenScreenReader' aria-live='polite' class='aria-content'></div>")
+    else
+      @live_screen_reader = reader
+
     $('body').append( @live_screen_reader )
 
     $("body").append( @dropdown )

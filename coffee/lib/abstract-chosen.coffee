@@ -95,7 +95,7 @@ class AbstractChosen
       for data in this.get_selected_items()
         if @is_multiple
           this.choice_build data
-        else
+        else if data
           this.single_set_selected_text(data.text)
 
     content
